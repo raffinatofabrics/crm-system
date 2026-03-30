@@ -2201,7 +2201,17 @@ async function uploadPriceFile(type) {
         const workbook = XLSX.read(data);
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-        
+
+        // ========== 添加调试代码 ==========
+        console.log('=== 上传文件调试信息 ===');
+        console.log('文件类型:', type);
+        console.log('行数:', rows.length);
+        console.log('表头(第1行):', rows[0]);
+        console.log('第1行数据:', rows[1]);
+        if (rows[2]) console.log('第2行数据:', rows[2]);
+        console.log('========================');
+        // ========== 调试代码结束 ========== 
+
         if (rows.length < 2) {
             showToast('文件至少需要包含表头和数据行', true);
             return;
