@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Raffinato商业信息管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, '微软雅黑', 'Microsoft YaHei', sans-serif;
+            background: #0f172a;
+            min-height: 100vh;
+        }
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .auth-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        .auth-card h2 { font-size: 1.8rem; color: #1e293b; margin-bottom: 0.5rem; }
+        .input-field { margin-bottom: 1.2rem; }
+        .input-field label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.4rem; }
+        .input-field input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .app-container { display: none; min-height: 100vh; background: #f1f5f9; }
+        .app-layout { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-area {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .company-logo {
+            max-width: 180px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .logo-placeholder {
+            width: 100%;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .company-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .sidebar-menu { flex: 1; padding: 1rem; }
+        .sidebar-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .sidebar-menu-item:hover { background: rgba(255,255,255,0.1); }
+        .sidebar-menu-item.active { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .user-info-sidebar { padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .user-name { font-weight: 600; margin-bottom: 0.3rem; }
+        .role-badge { padding: 0.2rem 0.6rem; border-radius: 2rem; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .role-admin { background: #10b981; color: white; }
+        .role-manager { background: #3b82f6; color: white; }
+        .role-user { background: #f59e0b; color: white; }
+        .logout-btn-sidebar {
+            width: 100%;
+            margin-top: 0.8rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+        .main-content { flex: 1; margin-left: 280px; padding: 1.5rem; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-card h4 { font-size: 0.7rem; color: #64748b; margin-bottom: 0.5rem; }
+        .stat-card .number { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+        .form-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .form-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: flex-end;
+        }
+        .input-group { flex: 1 1 130px; min-width: 110px; }
+        .input-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.6rem;
+            font-size: 0.8rem;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-sm { padding: 0.25rem 0.6rem; font-size: 0.7rem; }
+        .filter-bar {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        .filter-bar input, .filter-bar select {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+        }
+        .level-vip { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; }
+        .level-premium { background: #e97132; color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; }
+        .level-medium { background: #3b82f6; color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; }
+        .level-potential { background: #94a3b8; color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; display: inline-block; }
+        .region-badge, .type-badge { padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem; background: #e2e8f0; color: #475569; display: inline-block; }
+        .type-wholesale { background: #dbeafe; color: #1e40af; }
+        .type-design { background: #dcfce7; color: #166534; }
+        .type-factory { background: #fed7aa; color: #9a3412; }
+        .type-enduser { background: #f1f5f9; color: #475569; }
+        .table-wrapper { overflow-x: auto; background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.7rem 0.8rem; text-align: left; border-bottom: 1px solid #eef2f6; font-size: 0.8rem; }
+        th { background: #f8fafc; font-weight: 600; color: #1e293b; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.8rem; z-index: 1000; }
+        #logoUpload { display: none; }
+        .summary-box {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .summary-box h4 { margin-bottom: 0.8rem; color: #1e293b; border-left: 3px solid #667eea; padding-left: 0.8rem; }
+        .summary-stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .summary-card {
+            background: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .summary-card .label { font-size: 0.7rem; color: #64748b; }
+        .summary-card .value { font-size: 1.2rem; font-weight: 700; color: #667eea; }
+        .amount-positive { color: #10b981; font-weight: 600; }
+        .color-detail { margin-top: 0.5rem; margin-left: 1rem; font-size: 0.75rem; background: #f1f5f9; padding: 0.5rem; border-radius: 0.5rem; display: none; }
+        .color-detail.show { display: block; }
+        /* 销售单弹窗样式 */
+        .sales-order-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        .sales-order-content {
+            background: white;
+            width: 800px;
+            max-width: 95%;
+            max-height: 90%;
+            overflow-y: auto;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .print-buttons {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .print-buttons button {
+            margin: 0 10px;
+            padding: 8px 20px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 240px; }
+            .main-content { margin-left: 240px; padding: 1rem; }
+        }
+/* 手机端完整适配 */
+@media (max-width: 768px) {
+    /* 侧边栏固定宽度改为全宽 */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+    /* 主内容区取消左边距 */
+    .main-content {
+        margin-left: 0;
+        padding: 0.8rem;
+    }
+    /* 菜单横向滚动 */
+    .sidebar-menu {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        width: 100%;
+    }
+    .sidebar-menu-item {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    /* Logo区域水平排列 */
+    .logo-area {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 0.5rem;
+    }
+    .company-logo, .logo-placeholder {
+        max-width: 80px;
+        max-height: 40px;
+    }
+    .company-name {
+        font-size: 0.8rem;
+        margin: 0;
+    }
+    /* 用户信息水平排列 */
+    .user-info-sidebar {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding: 0.5rem;
+    }
+    .logout-btn-sidebar {
+        width: auto;
+        margin: 0;
+    }
+    /* 统计卡片2列 */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    /* 表单垂直排列 */
+    .form-grid {
+        flex-direction: column;
+    }
+    .input-group {
+        width: 100%;
+    }
+    /* 筛选栏垂直排列 */
+    .filter-bar {
+        flex-direction: column;
+    }
+    .filter-bar input,
+    .filter-bar select,
+    .filter-bar button {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    /* 表格横向滚动 */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    table {
+        min-width: 600px;
+    }
+}
+/* 价格表样式 */
+#domesticPriceTab .price-header,
+#importPriceTab .price-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+#domesticPriceTab .price-logo,
+#importPriceTab .price-logo {
+    width: 100px;
+    text-align: left;
+}
+#domesticPriceTab .price-logo img,
+#importPriceTab .price-logo img {
+    max-width: 150px;
+    max-height: 100px;
+    object-fit: contain;
+}
+#domesticPriceTab .price-title,
+#importPriceTab .price-title {
+    flex: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #1e293b;
+}
+#domesticPriceTab .price-date,
+#importPriceTab .price-date {
+    width: 100px;
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+}
+#domesticPriceTable,
+#importPriceTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+#domesticPriceTable th,
+#domesticPriceTable td,
+#importPriceTable th,
+#importPriceTable td {
+    border: 1px solid #ddd;
+    padding: 10px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+#domesticPriceTable th,
+#importPriceTable th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+#domesticPriceTable tbody tr:nth-child(odd),
+#importPriceTable tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+#domesticPriceTable tbody tr:nth-child(even),
+#importPriceTable tbody tr:nth-child(even) {
+    background-color: #F2F2F2;
+}
+#domesticPriceTable tbody tr:hover,
+#importPriceTable tbody tr:hover {
+    background-color: #eef2ff;
+}
+.price-table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+.price-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    justify-content: flex-end;
+}
+</style>
+</head>
+<body>
+    <div id="authContainer" class="auth-container">
+        <div class="auth-card">
+            <h2>Raffinato Fabrics</h2>
+            <p style="color:#64748b; margin-bottom:1.5rem;">Raffinato 商业信息管理系统</p>
+            <div id="loginForm">
+                <div class="input-field"><label>用户名</label><input type="text" id="loginUsername" placeholder="请输入用户名"></div>
+                <div class="input-field"><label>密码</label><input type="password" id="loginPassword" placeholder="请输入密码"></div>
+                <button class="auth-btn" onclick="handleLogin()">登录</button>
+                <div style="margin-top:1rem; text-align:center; font-size:0.7rem;">Copyright © Raffinato Fabrics.  - All Rights Reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="app-container">
+        <div class="app-layout">
+            <div class="sidebar">
+                <div class="logo-area" id="logoArea">
+                    <img id="companyLogo" class="company-logo" style="display:none;">
+                    <div id="logoPlaceholder" class="logo-placeholder">点击上传Logo</div>
+                    <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogo(this)">
+                    <div class="company-name">与您携手 共创辉煌</div>
+                </div>
+                <div class="sidebar-menu">
+                    <div class="sidebar-menu-item active" onclick="switchTab('customers')"><span>👥</span><span>客户管理</span></div>
+<div class="sidebar-menu-item" onclick="switchTab('orders')"><span>📦</span><span>订单管理</span></div>
+<div class="sidebar-menu-item" onclick="switchTab('summary')"><span>📊</span><span>订单汇总</span></div>
+<div class="sidebar-menu-item" onclick="switchTab('domesticPrice')"><span>🏭</span><span>自产面料</span></div>
+<div class="sidebar-menu-item" onclick="switchTab('importPrice')"><span>📦</span><span>进口面料</span></div>
+<div class="sidebar-menu-item" id="userMgmtTab" style="display:none;" onclick="switchTab('users')"><span>👑</span><span>用户管理</span></div>
+                </div>
+                <div class="user-info-sidebar">
+                    <div class="user-name" id="sidebarUserName"></div>
+                    <span class="role-badge" id="sidebarRoleBadge"></span>
+                    <button class="logout-btn-sidebar" onclick="handleLogout()">退出登录</button>
+                </div>
+            </div>
+            <div class="main-content">
+                <!-- 客户管理 - 公司名称优先 -->
+                <div id="customersTab">
+                    <div class="stats-grid" id="customerStats"></div>
+                    <div class="form-card">
+                        <div class="form-grid">
+                            <div class="input-group"><label>公司名称 *</label><input type="text" id="custCompany" placeholder="公司名称"></div>
+                            <div class="input-group"><label>联系人姓名</label><input type="text" id="custName" placeholder="联系人姓名"></div>
+                            <div class="input-group"><label>邮箱</label><input type="email" id="custEmail" placeholder="邮箱"></div>
+                            <div class="input-group"><label>电话</label><input type="tel" id="custPhone" placeholder="电话"></div>
+                            <div class="input-group"><label>客户性质</label>
+                                <select id="custType">
+                                    <option value="wholesale">批发商</option>
+                                    <option value="design">设计公司</option>
+                                    <option value="factory">家具厂</option>
+                                    <option value="enduser">终端用户</option>
+                                </select>
+                            </div>
+                            <div class="input-group"><label>区域类型</label><select id="regionType" onchange="toggleRegionInput()"><option value="domestic">国内</option><option value="international">国外</option></select></div>
+                            <div class="input-group" id="provinceGroup"><label>省份</label><select id="province"></select></div>
+                            <div class="input-group" id="cityGroup"><label>城市</label><input type="text" id="city" placeholder="城市"></div>
+                            <div class="input-group" id="continentGroup" style="display:none;"><label>大洲</label><select id="continent"><option value="亚洲">亚洲</option><option value="欧洲">欧洲</option><option value="北美洲">北美洲</option><option value="南美洲">南美洲</option><option value="大洋洲">大洋洲</option><option value="非洲">非洲</option></select></div>
+                            <div class="input-group" id="countryGroup" style="display:none;"><label>国家</label><input type="text" id="country" placeholder="国家名称"></div>
+                            <div class="input-group"><label>客户等级</label><select id="custLevel"><option value="vip">VIP</option><option value="premium">高级</option><option value="medium">中级</option><option value="potential">潜在</option></select></div>
+                            <div><button class="btn btn-primary" onclick="saveCustomer()">添加客户</button></div>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" id="custSearch" placeholder="搜索公司/联系人" oninput="loadCustomers()">
+                        <select id="levelFilter" onchange="loadCustomers()"><option value="">全部等级</option><option value="vip">VIP</option><option value="premium">高级</option><option value="medium">中级</option><option value="potential">潜在</option></select>
+                        <select id="typeFilter" onchange="loadCustomers()"><option value="">全部性质</option><option value="wholesale">批发商</option><option value="design">设计公司</option><option value="factory">家具厂</option><option value="enduser">终端用户</option></select>
+                        <button class="btn btn-success" onclick="exportCustomersToExcel()">📎 导出Excel</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+    <tr>
+        <th>公司名称</th>
+        <th>联系人</th>
+        <th>联系方式</th>
+        <th>性质</th>
+        <th>区域</th>
+        <th>等级</th>
+        <th>创建人</th>
+        <th>操作</th>
+     </>
+</thead>
+                            <tbody id="customersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 订单管理 - 客户公司优先 -->
+                <div id="ordersTab" style="display:none;">
+                    <div class="stats-grid">
+                        <div class="stat-card"><h4>总订单数</h4><div class="number" id="orderCount">0</div></div>
+                        <div class="stat-card"><h4>总金额</h4><div class="number" id="totalAmount">¥0</div></div>
+                        <div class="stat-card"><h4>总数量</h4><div class="number" id="totalQuantity">0</div></div>
+                    </div>
+                    <div class="form-card">
+                        <div class="form-grid">
+                            <div class="input-group"><label>订单日期</label><input type="date" id="orderDate"></div>
+                            <div class="input-group" style="position: relative; min-width: 200px;">
+    <label>客户公司</label>
+    <div style="position: relative;">
+        <input type="text" id="orderCustomerInput" placeholder="输入或选择客户公司" autocomplete="off" style="width: 100%; padding: 0.5rem 2rem 0.5rem 0.8rem; border: 1px solid #ddd; border-radius: 0.6rem;">
+        <button type="button" id="orderCustomerDropdownBtn" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: #666;">▼</button>
+        <div id="orderCustomerDropdownList" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #ddd; border-radius: 4px; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 2px;"></div>
+    </div>
+    <input type="hidden" id="orderCustomer" value="">
+</div>
+                            <div class="input-group"><label>品名</label><input type="text" id="productName" placeholder="产品名称"></div>
+                            <div class="input-group"><label>色号</label><input type="text" id="colorCode" placeholder="色号/颜色代码"></div>
+                            <div class="input-group"><label>数量(米)</label><input type="number" id="quantity" step="0.01" placeholder="数量"></div>
+                            <div class="input-group"><label>单价(元)</label><input type="number" id="unitPrice" step="0.01" placeholder="单价"></div>
+                            <div class="input-group"><label>金额</label><input type="text" id="amount" readonly placeholder="自动计算"></div>
+                            <div><button class="btn btn-primary" onclick="saveOrder()">📦 添加订单</button></div>
+                        </div>
+                    </div>
+                    <div class="filter-bar">
+                        <input type="text" id="orderSearch" placeholder="搜索公司/品名" oninput="loadOrders()">
+                        <input type="date" id="dateFrom" placeholder="开始日期" onchange="loadOrders()">
+                        <input type="date" id="dateTo" placeholder="结束日期" onchange="loadOrders()">
+                        <button class="btn btn-success" onclick="exportOrdersToExcel()">📎 导出Excel</button>
+                        <button class="btn" onclick="clearOrderFilters()">🗑 清除筛选</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+    <tr>
+        <th>日期</th>
+        <th>客户公司</th>
+        <th>品名</th>
+        <th>色号</th>
+        <th>数量(米)</th>
+        <th>单价</th>
+        <th>金额</th>
+        <th>创建人</th>
+        <th>操作</th>
+     </>
+</thead>
+                            <tbody id="ordersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 订单汇总页面（如果缺失） -->
+<div id="summaryTab" style="display:none;">
+    <div class="form-card">
+        <div class="form-grid">
+            <div class="input-group"><label>汇总类型</label>
+                <select id="summaryType" onchange="onSummaryTypeChange()">
+                    <option value="customer_month">按客户+月份汇总</option>
+                    <option value="customer_year">按客户+年份汇总</option>
+                    <option value="product_month">按品名+月份汇总</option>
+                    <option value="product_year">按品名+年份汇总</option>
+                    <option value="product_color_month">按品名+色号+月份汇总</option>
+                    <option value="product_color_year">按品名+色号+年份汇总</option>
+                    <option value="customer_rank_month">客户金额排名+月份</option>
+                    <option value="customer_rank_year">客户金额排名+年份</option>
+                </select>
+            </div>
+            <div class="input-group" id="yearGroup" style="display:none;"><label>选择年份</label><select id="summaryYear" onchange="loadSummary()"></select></div>
+            <div class="input-group" id="monthGroup" style="display:none;"><label>选择月份</label><select id="summaryMonth" onchange="loadSummary()"></select></div>
+            <div><button class="btn btn-primary" onclick="loadSummary()">查询汇总</button></div>
+            <div><button class="btn btn-success" onclick="exportSummaryToExcel()">📎 导出Excel</button></div>
+        </div>
+    </div>
+    <div id="summaryResult"></div>
+</div>
+
+<!-- 自产面料价格表 -->
+<div id="domesticPriceTab" style="display:none;">
+    <div class="form-card">
+        <div class="price-header">
+            <div class="price-logo" id="domesticPriceLogo"></div>
+            <div class="price-title">Raffinato面料价格目录表</div>
+            <div class="price-date" id="domesticPriceDate"></div>
+        </div>
+        <div class="price-buttons">
+    <button class="btn" id="domesticPriceCny" onclick="switchDomesticCurrency('cny')" style="background:#667eea; color:white;">人民币报价</button>
+    <button class="btn" id="domesticPriceUsd" onclick="switchDomesticCurrency('usd')">美金报价</button>
+    <button class="btn btn-success" onclick="downloadPriceFile('domestic', 'cny')">📎 下载人民币价格表</button>
+    <button class="btn btn-success" onclick="downloadPriceFile('domestic', 'usd')">📎 下载美金价格表</button>
+    <button class="btn btn-primary" id="uploadDomesticBtn" style="display:none;" onclick="uploadPriceFile('domestic')">📤 上传更新价格表</button>
+</div>
+        <div class="price-table-wrapper">
+            <table id="domesticPriceTable">
+                <thead><tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>面料克重(GSM)</th><th>复合克重(GSM)</th><th>总克重(GSM)</th><th>成分</th><th>卷价(元/米)</th><th>零剪价格(元/米)</th></tr></thead>
+                <tbody id="domesticPriceBody"></tbody>
+             </table>
+        </div>
+        <div style="margin-top:10px; font-size:12px; color:#666; text-align:right;">最后更新：<span id="domesticUpdateTime">—</span></div>
+    </div>
+</div>
+
+<!-- 进口面料价格表 -->
+<div id="importPriceTab" style="display:none;">
+    <div class="form-card">
+        <div class="price-header">
+            <div class="price-logo" id="importPriceLogo"></div>
+            <div class="price-title">Raffinato进口面料价格目录表</div>
+            <div class="price-date" id="importPriceDate"></div>
+        </div>
+        <div class="price-buttons">
+            <button class="btn btn-success" onclick="downloadPriceFile('import', 'cn')">📎 下载中国内地市场价格表</button>
+            <button class="btn btn-primary" id="uploadImportBtn" style="display:none;" onclick="uploadPriceFile('import')">📤 上传更新价格表</button>
+        </div>
+        <div class="price-table-wrapper">
+            <table id="importPriceTable">
+                <thead><tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>销售价格(元/米)</th><th>经销商价格(元/米)</th><th>渠道价格(元/米)</th><th>样卡价格(元/个)</th></tr></thead>
+                <tbody id="importPriceBody"></tbody>
+             </table>
+        </div>
+        <div style="margin-top:10px; font-size:12px; color:#666; text-align:right;">最后更新：<span id="importUpdateTime">—</span></div>
+    </div>
+</div>
+
+              <!-- 用户管理 -->
+<div id="usersTab" style="display:none;">
+    <div class="form-card">
+        <div class="form-grid">
+            <div class="input-group"><label>用户名</label><input type="text" id="newUsername"></div>
+            <div class="input-group"><label>密码</label><input type="password" id="newPassword"></div>
+            <div class="input-group"><label>权限</label>
+                <select id="newRole">
+                    <option value="user">业务人员</option>
+                    <option value="manager">主管</option>
+                    <option value="admin">管理员</option>
+                </select>
+            </div>
+            <div><button class="btn btn-primary" onclick="createUser()">创建用户</button></div>
+        </div>
+    </div>
+    
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr><th>用户名</th><th>权限</th><th>客户数</th><th>订单数</th><th>操作</th> </>
+            </thead>
+            <tbody id="usersTable"></tbody>
+        </table>
+    </div>
+    
+    <!-- 销售单Logo设置 -->
+    <div class="form-card" style="margin-top:1rem;">
+        <h3 style="margin-bottom:1rem;">🖼️ 销售单Logo设置</h3>
+        <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+            <img id="invoiceLogoPreview" style="max-width:120px; max-height:60px; object-fit:contain; border:1px solid #ddd; border-radius:4px; display:none;">
+            <button class="btn btn-primary" onclick="document.getElementById('invoiceLogoUpload').click()">📎 上传销售单Logo</button>
+            <button class="btn" onclick="clearInvoiceLogo()" id="clearInvoiceLogoBtn" style="display:none;">🗑️ 清除</button>
+            <input type="file" id="invoiceLogoUpload" accept="image/*" style="display:none;" onchange="uploadInvoiceLogo(this)">
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:#666;">
+            建议尺寸：宽80-180px，高40-80px，透明背景PNG最佳
+        </div>
+    </div>
+    
+    <!-- 公司印章设置 -->
+    <div class="form-card" style="margin-top:1rem;">
+        <h3 style="margin-bottom:1rem;">🔏 公司印章设置</h3>
+        <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+            <img id="stampPreview" style="max-width:100px; max-height:100px; object-fit:contain; border:1px solid #ddd; border-radius:4px; display:none;">
+            <button class="btn btn-primary" onclick="document.getElementById('stampUpload').click()">📎 上传印章</button>
+            <button class="btn" onclick="clearStamp()" id="clearStampBtn" style="display:none;">🗑️ 清除</button>
+            <input type="file" id="stampUpload" accept="image/*" style="display:none;" onchange="uploadStamp(this)">
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:#666;">
+            建议尺寸：80-100px，透明背景PNG最佳，圆形印章效果更好
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+    <div id="toast" class="toast" style="display:none;"></div>
+
+    <!-- 销售单弹窗 -->
+    <div id="salesOrderModal" class="sales-order-modal">
+        <div class="sales-order-content">
+            <div id="salesOrderContent"></div>
+            <div class="print-buttons">
+                <button class="btn btn-primary" onclick="printSalesOrderPDF()">🖨️ 打印</button>
+                <button class="btn" onclick="closeSalesOrderModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        // ========== 请在这里填写您的 Supabase 配置 ==========
+        const SUPABASE_URL = 'https://fsnebupguhbhrmbofexj.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_COlpvlI-7l2t23t98Q4fzw_KZamMTLm';
+    // ====================================================
+        
+        let supabaseClient = null;
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('客户端创建成功');
+        } catch(e) {
+            console.error('客户端创建失败:', e);
+        }
+        
+        let currentUser = null;
+        let allOrdersForExport = [];
+        let currentSummaryData = [];
+        let currentSummaryType = '';
+        let currentDomesticCurrency = 'cny';  // cny=人民币, usd=美金
+
+        const provinces = ['北京市','天津市','上海市','重庆市','河北省','山西省','辽宁省','吉林省','黑龙江省','江苏省','浙江省','安徽省','福建省','江西省','山东省','河南省','湖北省','湖南省','广东省','海南省','四川省','贵州省','云南省','陕西省','甘肃省','青海省','台湾省','内蒙古自治区','广西壮族自治区','宁夏回族自治区','新疆维吾尔自治区','西藏自治区','香港特别行政区','澳门特别行政区'];
+        const typeNames = { wholesale: '批发商', design: '设计公司', factory: '家具厂', enduser: '终端用户' };
+        const typeClass = { wholesale: 'type-wholesale', design: 'type-design', factory: 'type-factory', enduser: 'type-enduser' };
+        
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.backgroundColor = isError ? '#b91c1c' : '#1f6392';
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 2500);
+        }
+        
+        function uploadLogo(input) {
+            if (!isAdmin()) {
+                showToast('只有管理员可以上传Logo', true);
+                return;
+            }
+            if (input.files?.[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('companyLogo').src = e.target.result;
+                    document.getElementById('companyLogo').style.display = 'block';
+                    document.getElementById('logoPlaceholder').style.display = 'none';
+                    localStorage.setItem('company_logo', e.target.result);
+                    showToast('Logo上传成功');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        function loadSavedLogo() {
+            const saved = localStorage.getItem('company_logo');
+            if (saved) {
+                document.getElementById('companyLogo').src = saved;
+                document.getElementById('companyLogo').style.display = 'block';
+                document.getElementById('logoPlaceholder').style.display = 'none';
+            }
+        }
+        
+        function toggleRegionInput() {
+            const type = document.getElementById('regionType').value;
+            document.getElementById('provinceGroup').style.display = type === 'domestic' ? 'block' : 'none';
+            document.getElementById('cityGroup').style.display = type === 'domestic' ? 'block' : 'none';
+            document.getElementById('continentGroup').style.display = type === 'international' ? 'block' : 'none';
+            document.getElementById('countryGroup').style.display = type === 'international' ? 'block' : 'none';
+        }
+        
+        function initProvinceSelect() {
+            const select = document.getElementById('province');
+            select.innerHTML = provinces.map(p => `<option value="${p}">${p}</option>`).join('');
+        }
+        
+        function isAdmin() { return currentUser?.role === 'admin'; }
+        function isManager() { return currentUser?.role === 'manager' || isAdmin(); }
+        function canDelete(ownerUserId) {
+    // 只有管理员可以删除
+    if (isAdmin()) return true;
+    return false;
+}
+        async function handleLogin() {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!username || !password) {
+        showToast('请输入用户名和密码', true);
+        return;
+    }
+    
+    if (!supabaseClient || typeof supabaseClient.from !== 'function') {
+        showToast('Supabase连接失败，请检查配置', true);
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('id,username,nickname,role')
+            .eq('username', username)
+            .eq('password', password)
+            .single();
+        
+        if (error || !data) {
+            showToast('用户名或密码错误', true);
+            return;
+        }
+        
+        currentUser = data;
+        
+        // 使用 sessionStorage 保存（关闭浏览器后失效）
+        sessionStorage.setItem('crm_user', JSON.stringify(currentUser));
+        
+        document.getElementById('sidebarUserName').innerText = currentUser.nickname || currentUser.username;
+        const badge = document.getElementById('sidebarRoleBadge');
+        badge.innerText = currentUser.role === 'admin' ? '管理员' : (currentUser.role === 'manager' ? '主管' : '业务人员');
+        badge.className = `role-badge role-${currentUser.role}`;
+        
+        if (isAdmin()) {
+            document.getElementById('userMgmtTab').style.display = 'flex';
+            document.getElementById('logoPlaceholder').style.cursor = 'pointer';
+            document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
+        } else {
+            document.getElementById('logoPlaceholder').style.cursor = 'default';
+            document.getElementById('logoPlaceholder').onclick = null;
+        }
+        
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'block';
+        
+        await initTables();
+        loadCustomers();
+        loadOrders();
+        initYearSelect();
+        if (isAdmin()) loadUsers();
+        
+    } catch (err) {
+        console.error('登录错误:', err);
+        showToast('登录失败: ' + err.message, true);
+    }
+}
+        
+        function handleLogout() { currentUser = null; sessionStorage.removeItem('crm_user'); location.reload(); }
+        
+        async function initTables() {
+            if (!supabaseClient) return;
+            try {
+                await supabaseClient.rpc('exec_sql', { sql: `
+                    CREATE TABLE IF NOT EXISTS users (id BIGSERIAL PRIMARY KEY, username VARCHAR(50) UNIQUE, password VARCHAR(255), nickname VARCHAR(100), role VARCHAR(20) DEFAULT 'user', created_at TIMESTAMP DEFAULT NOW());
+                    CREATE TABLE IF NOT EXISTS customers (id BIGSERIAL PRIMARY KEY, name VARCHAR(100), company VARCHAR(200), email VARCHAR(100), phone VARCHAR(50), type VARCHAR(20), region_type VARCHAR(20), province VARCHAR(50), city VARCHAR(100), continent VARCHAR(50), country VARCHAR(100), level VARCHAR(20), user_id BIGINT, created_at TIMESTAMP DEFAULT NOW());
+                    CREATE TABLE IF NOT EXISTS orders (id BIGSERIAL PRIMARY KEY, order_date DATE, customer_id BIGINT, product_name VARCHAR(100), color_code VARCHAR(50), quantity DECIMAL(12,2), unit_price DECIMAL(12,2), amount DECIMAL(12,2), user_id BIGINT, created_at TIMESTAMP DEFAULT NOW());
+                    INSERT INTO users (username, password, nickname, role) SELECT 'admin', 'admin123', '管理员', 'admin' WHERE NOT EXISTS (SELECT 1 FROM users WHERE username='admin');
+                    INSERT INTO users (username, password, nickname, role) SELECT 'manager', '123456', '主管', 'manager' WHERE NOT EXISTS (SELECT 1 FROM users WHERE username='manager');
+                    INSERT INTO users (username, password, nickname, role) SELECT 'user', '123456', '业务人员', 'user' WHERE NOT EXISTS (SELECT 1 FROM users WHERE username='user');
+                `}).catch(console.log);
+            } catch(e) { console.log('建表跳过'); }
+        }
+        
+        // ========== 客户管理 ==========
+        async function loadCustomers() {
+    if (!currentUser || !supabaseClient) return;
+    const search = document.getElementById('custSearch')?.value || '';
+    const levelFilter = document.getElementById('levelFilter')?.value || '';
+    const typeFilter = document.getElementById('typeFilter')?.value || '';
+    
+    // 关联查询用户信息
+    let query = supabaseClient.from('customers').select('*, users!customers_user_id_fkey(nickname, username)');
+    
+    if (!isAdmin()) {
+        if (isManager()) {
+            const { data: subs } = await supabaseClient.from('users').select('id').eq('role', 'user');
+            const ids = [currentUser.id, ...(subs?.map(s => s.id) || [])];
+            query = query.in('user_id', ids);
+        } else {
+            query = query.eq('user_id', currentUser.id);
+        }
+    }
+    if (search) query = query.or(`company.ilike.%${search}%,name.ilike.%${search}%`);
+    if (levelFilter) query = query.eq('level', levelFilter);
+    if (typeFilter) query = query.eq('type', typeFilter);
+    
+    const { data } = await query.order('created_at', { ascending: false });
+    renderCustomers(data || []);
+    document.getElementById('customerStats').innerHTML = `<div class="stat-card"><h4>我的客户</h4><div class="number">${data?.length || 0}</div></div>`;
+}
+        
+       function renderCustomers(customers) {
+    const tbody = document.getElementById('customersTable');
+    if (!customers.length) { 
+        tbody.innerHTML = '=<td colspan="8" style="text-align:center;">暂无客户客户'; 
+        return; 
+    }
+    const levelNames = { vip:'VIP', premium:'高级', medium:'中级', potential:'潜在' };
+    let html = '';
+    for (let i = 0; i < customers.length; i++) {
+        const c = customers[i];
+        
+        let regionText = '';
+        if (c.region_type === 'domestic') {
+            regionText = `${c.province || ''} ${c.city || ''}`.trim() || '国内';
+        } else if (c.region_type === 'international') {
+            regionText = `${c.continent || ''} - ${c.country || ''}`.trim() || '国外';
+        } else {
+            regionText = '—';
+        }
+        
+        const typeText = typeNames[c.type] || '—';
+        const typeClassVal = typeClass[c.type] || 'region-badge';
+        const displayCompany = c.company && c.company.trim() !== '' ? c.company : '—';
+        const displayName = c.name && c.name.trim() !== '' ? c.name : '—';
+        const creatorName = c.users?.nickname || c.users?.username || '—';
+        
+        html += '<tr>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><strong>' + escapeHtml(displayCompany) + '</strong></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + escapeHtml(displayName) + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + escapeHtml(c.email||'') + '<br>' + escapeHtml(c.phone||'') + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><span class="' + typeClassVal + '">' + typeText + '</span></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><span class="region-badge">' + escapeHtml(regionText) + '</span></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><span class="level-' + c.level + '">' + levelNames[c.level] + '</span></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + escapeHtml(creatorName) + '</td>';
+       html += '<td style="border:1px solid #ddd; padding:8px;">';
+        if (isAdmin()) {
+    html += '<button onclick="editCustomer(' + c.id + ')">✏</button>';
+} else {
+    html += '—';
+}
+        if (canDelete(c.user_id)) {
+            html += '<button onclick="deleteCustomer(' + c.id + ')">🗑</button>';
+        } else {
+            html += '—';
+        }
+        html += '</td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+}
+        
+        async function saveCustomer() {
+    const company = document.getElementById('custCompany').value.trim();
+    if (!company) { showToast('请填写公司名称', true); return; }
+    const regionType = document.getElementById('regionType').value;
+    
+    const data = {
+        company: company,
+        name: document.getElementById('custName').value,
+        email: document.getElementById('custEmail').value,
+        phone: document.getElementById('custPhone').value,
+        type: document.getElementById('custType').value,
+        region_type: regionType,
+        level: document.getElementById('custLevel').value,
+        user_id: currentUser.id
+    };
+    
+    if (regionType === 'domestic') {
+        data.province = document.getElementById('province').value;
+        data.city = document.getElementById('city').value;
+        data.continent = null;
+        data.country = null;
+    } else {
+        data.continent = document.getElementById('continent').value;
+        data.country = document.getElementById('country').value;
+        data.province = null;
+        data.city = null;
+    }
+    
+    try {
+        const { error } = await supabaseClient.from('customers').insert([data]);
+        if (error) { showToast('添加失败: ' + error.message, true); return; }
+        showToast('添加成功');
+        
+        // 清空表单
+        document.getElementById('custCompany').value = '';
+        document.getElementById('custName').value = '';
+        document.getElementById('custEmail').value = '';
+        document.getElementById('custPhone').value = '';
+        document.getElementById('city').value = '';
+        document.getElementById('country').value = '';
+        
+        // 重新加载客户列表
+        loadCustomers();
+        
+        // ========== 重新加载订单页面的客户下拉搜索框 ==========
+        if (typeof loadCustomerSearchList === 'function') {
+            await loadCustomerSearchList();
+        }
+        // 如果使用普通下拉框，重新加载
+        const orderCustomerSelect = document.getElementById('orderCustomer');
+        if (orderCustomerSelect) {
+            const { data: customers } = await supabaseClient.from('customers').select('id,company,name').order('company');
+            orderCustomerSelect.innerHTML = (customers||[]).map(c => {
+                const displayName = c.company && c.company.trim() !== '' ? c.company : c.name;
+                return `<option value="${c.id}">${escapeHtml(displayName)}</option>`;
+            }).join('');
+        }
+        // 如果使用搜索输入框，也重新加载
+        const orderCustomerInput = document.getElementById('orderCustomerInput');
+        if (orderCustomerInput && typeof loadCustomerSearchList === 'function') {
+            await loadCustomerSearchList();
+        }
+        // ====================================================
+        
+    } catch (err) {
+        showToast('添加失败', true);
+    }
+}
+        
+        async function deleteCustomer(id) {
+            if (confirm('确定删除？')) {
+                await supabaseClient.from('customers').delete().eq('id', id);
+                loadCustomers();
+            }
+        }
+        // 编辑客户
+async function editCustomer(id) {
+    const { data: customer } = await supabaseClient.from('customers').select('*').eq('id', id).single();
+    if (!customer) {
+        showToast('获取客户信息失败', true);
+        return;
+    }
+    
+    document.getElementById('custCompany').value = customer.company || '';
+    document.getElementById('custName').value = customer.name || '';
+    document.getElementById('custEmail').value = customer.email || '';
+    document.getElementById('custPhone').value = customer.phone || '';
+    document.getElementById('custType').value = customer.type || 'wholesale';
+    document.getElementById('regionType').value = customer.region_type || 'domestic';
+    document.getElementById('custLevel').value = customer.level || 'medium';
+    
+    if (customer.region_type === 'domestic') {
+        document.getElementById('province').value = customer.province || '北京市';
+        document.getElementById('city').value = customer.city || '';
+    } else {
+        document.getElementById('continent').value = customer.continent || '亚洲';
+        document.getElementById('country').value = customer.country || '';
+    }
+    toggleRegionInput();
+    
+    const saveBtn = document.querySelector('#customersTab .btn-primary');
+    saveBtn.textContent = '✏ 更新客户';
+    saveBtn.setAttribute('onclick', `updateCustomer(${id})`);
+    
+    if (!document.getElementById('cancelEditBtn')) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.id = 'cancelEditBtn';
+        cancelBtn.className = 'btn';
+        cancelBtn.textContent = '取消';
+        cancelBtn.onclick = cancelCustomerEdit;
+        saveBtn.parentNode.appendChild(cancelBtn);
+    }
+}
+
+// 更新客户
+async function updateCustomer(id) {
+    const company = document.getElementById('custCompany').value.trim();
+    if (!company) { showToast('请填写公司名称', true); return; }
+    
+    const regionType = document.getElementById('regionType').value;
+    const data = {
+        company: company,
+        name: document.getElementById('custName').value,
+        email: document.getElementById('custEmail').value,
+        phone: document.getElementById('custPhone').value,
+        type: document.getElementById('custType').value,
+        region_type: regionType,
+        level: document.getElementById('custLevel').value
+    };
+    
+    if (regionType === 'domestic') {
+        data.province = document.getElementById('province').value;
+        data.city = document.getElementById('city').value;
+    } else {
+        data.continent = document.getElementById('continent').value;
+        data.country = document.getElementById('country').value;
+    }
+    
+    const { error } = await supabaseClient.from('customers').update(data).eq('id', id);
+    
+    if (error) {
+        showToast('更新失败: ' + error.message, true);
+    } else {
+        showToast('更新成功');
+        cancelCustomerEdit();
+        loadCustomers();
+    }
+}
+
+// 取消编辑
+function cancelCustomerEdit() {
+    document.getElementById('custCompany').value = '';
+    document.getElementById('custName').value = '';
+    document.getElementById('custEmail').value = '';
+    document.getElementById('custPhone').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('country').value = '';
+    
+    const saveBtn = document.querySelector('#customersTab .btn-primary');
+    saveBtn.textContent = '添加客户';
+    saveBtn.setAttribute('onclick', 'saveCustomer()');
+    
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    if (cancelBtn) cancelBtn.remove();
+}
+        // ========== 订单管理 ==========
+        async function loadOrders() {
+    if (!currentUser || !supabaseClient) return;
+    
+    const search = document.getElementById('orderSearch')?.value || '';
+    const dateFrom = document.getElementById('dateFrom')?.value || '';
+    const dateTo = document.getElementById('dateTo')?.value || '';
+    
+    // 关联查询客户信息和用户信息（创建人）
+    let query = supabaseClient.from('orders').select('*, customers!orders_customer_id_fkey(company, name, phone), users!orders_user_id_fkey(nickname, username)');
+    
+    if (!isAdmin()) {
+        if (isManager()) {
+            const { data: subs } = await supabaseClient.from('users').select('id').eq('role', 'user');
+            const ids = [currentUser.id, ...(subs?.map(s => s.id) || [])];
+            query = query.in('user_id', ids);
+        } else {
+            query = query.eq('user_id', currentUser.id);
+        }
+    }
+    
+    if (dateFrom) query = query.gte('order_date', dateFrom);
+    if (dateTo) query = query.lte('order_date', dateTo);
+    query = query.order('order_date', { ascending: false }).order('created_at', { ascending: false });
+    
+    const { data, error } = await query;
+    if (error) { console.error(error); showToast('查询失败', true); return; }
+    
+    let filteredData = data || [];
+    if (search) {
+        const lowerSearch = search.toLowerCase();
+        filteredData = filteredData.filter(order => {
+            return (order.product_name && order.product_name.toLowerCase().includes(lowerSearch)) ||
+                   (order.customers?.company && order.customers.company.toLowerCase().includes(lowerSearch)) ||
+                   (order.customers?.name && order.customers.name.toLowerCase().includes(lowerSearch));
+        });
+    }
+    
+    allOrdersForExport = filteredData;
+    renderOrders(allOrdersForExport);
+    
+    const totalQ = filteredData.reduce((s,o)=>s+(o.quantity||0),0)||0;
+    const totalA = filteredData.reduce((s,o)=>s+(o.amount||0),0)||0;
+    document.getElementById('orderCount').innerText = filteredData.length;
+    document.getElementById('totalQuantity').innerText = totalQ.toFixed(0);
+    document.getElementById('totalAmount').innerText = `¥${totalA.toFixed(2)}`;
+    
+    const { data: customers } = await supabaseClient.from('customers').select('id,company,name').order('company');
+    document.getElementById('orderCustomer').innerHTML = (customers||[]).map(c => {
+        const displayName = c.company && c.company.trim() !== '' ? c.company : c.name;
+        return `<option value="${c.id}">${escapeHtml(displayName)}</option>`;
+    }).join('');
+    
+    document.getElementById('orderDate').value = new Date().toISOString().slice(0,10);
+    
+    document.getElementById('quantity').addEventListener('input', calcAmount);
+    document.getElementById('unitPrice').addEventListener('input', calcAmount);
+}
+        
+        function calcAmount() {
+            const q = parseFloat(document.getElementById('quantity').value)||0;
+            const p = parseFloat(document.getElementById('unitPrice').value)||0;
+            document.getElementById('amount').value = (q*p).toFixed(2);
+        }
+        
+       function renderOrders(orders) {
+    const tbody = document.getElementById('ordersTable');
+    if (!orders.length) { 
+        tbody.innerHTML = '=<td colspan="9" style="text-align:center;">暂无订单订单'; 
+        return; 
+    }
+    let html = '';
+    for (let i = 0; i < orders.length; i++) {
+        const o = orders[i];
+        const creatorName = o.users?.nickname || o.users?.username || '—';
+        html += '<tr>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + o.order_date + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><strong>' + escapeHtml(o.customers?.company || o.customers?.name || '') + '</strong></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;"><strong>' + escapeHtml(o.product_name) + '</strong>';
+        if (o.color_code) {
+            html += '<br><span style="font-size:0.7rem;color:#64748b;">' + escapeHtml(o.color_code) + '</span>';
+        }
+        html += '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + (o.color_code || '—') + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + o.quantity + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">¥' + o.unit_price + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;" class="amount-positive">¥' + o.amount + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;">' + escapeHtml(creatorName) + '</td>';
+        html += '<td style="border:1px solid #ddd; padding:8px;" class="action-icons">';
+        if (isAdmin()) {
+    html += '<button onclick="editOrder(' + o.id + ')">✏</button>';
+} else {
+    html += '—';
+}
+        if (canDelete(o.user_id)) {
+            html += '<button onclick="deleteOrder(' + o.id + ')">🗑</button>';
+        } else {
+            html += '—';
+        }
+        html += '<button onclick="printSingleOrder(' + o.id + ')">🖨</button>';
+        html += '</td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+}
+        
+        async function saveOrder() {
+            const customerId = document.getElementById('orderCustomer').value;
+if (!customerId) { showToast('请选择客户公司', true); return; }
+            const quantity = parseFloat(document.getElementById('quantity').value)||0;
+            const unitPrice = parseFloat(document.getElementById('unitPrice').value)||0;
+            const data = {
+                order_date: document.getElementById('orderDate').value,
+                customer_id: parseInt(customerId),
+                product_name: document.getElementById('productName').value.trim(),
+                color_code: document.getElementById('colorCode').value.trim(),
+                quantity: quantity,
+                unit_price: unitPrice,
+                amount: quantity * unitPrice,
+                user_id: currentUser.id
+            };
+            if (!data.product_name) { showToast('请填写品名', true); return; }
+            await supabaseClient.from('orders').insert([data]);
+            showToast('订单添加成功');
+            document.getElementById('productName').value = '';
+            document.getElementById('colorCode').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('unitPrice').value = '';
+            document.getElementById('amount').value = '';
+            loadOrders();
+        }
+// 编辑订单
+async function editOrder(id) {
+    const { data: order } = await supabaseClient.from('orders').select('*').eq('id', id).single();
+    if (!order) {
+        showToast('获取订单信息失败', true);
+        return;
+    }
+    
+    // 填充表单
+    document.getElementById('orderDate').value = order.order_date;
+    document.getElementById('orderCustomer').value = order.customer_id;
+    document.getElementById('productName').value = order.product_name || '';
+    document.getElementById('colorCode').value = order.color_code || '';
+    document.getElementById('quantity').value = order.quantity || '';
+    document.getElementById('unitPrice').value = order.unit_price || '';
+    calcAmount();
+    
+    // 修改保存按钮为更新
+    const saveBtn = document.querySelector('#ordersTab .btn-primary');
+    saveBtn.textContent = '✏ 更新订单';
+    saveBtn.setAttribute('onclick', `updateOrder(${id})`);
+    
+    // 添加取消按钮
+    if (!document.getElementById('cancelOrderEditBtn')) {
+        const cancelBtn = document.createElement('button');
+        cancelBtn.id = 'cancelOrderEditBtn';
+        cancelBtn.className = 'btn';
+        cancelBtn.textContent = '取消';
+        cancelBtn.onclick = cancelOrderEdit;
+        saveBtn.parentNode.appendChild(cancelBtn);
+    }
+}
+
+// 更新订单
+async function updateOrder(id) {
+    const customerId = document.getElementById('orderCustomer').value;
+    if (!customerId) { showToast('请选择客户公司', true); return; }
+    
+    const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+    
+    const data = {
+        order_date: document.getElementById('orderDate').value,
+        customer_id: parseInt(customerId),
+        product_name: document.getElementById('productName').value.trim(),
+        color_code: document.getElementById('colorCode').value.trim(),
+        quantity: quantity,
+        unit_price: unitPrice,
+        amount: quantity * unitPrice,
+    };
+    
+    if (!data.product_name) { showToast('请填写品名', true); return; }
+    
+    const { error } = await supabaseClient.from('orders').update(data).eq('id', id);
+    
+    if (error) {
+        showToast('更新失败: ' + error.message, true);
+    } else {
+        showToast('更新成功');
+        cancelOrderEdit();
+        loadOrders();
+    }
+}
+
+// 取消编辑订单
+function cancelOrderEdit() {
+    // 清空表单
+    document.getElementById('orderCustomer').value = '';
+    document.getElementById('productName').value = '';
+    document.getElementById('colorCode').value = '';
+    document.getElementById('quantity').value = '';
+    document.getElementById('unitPrice').value = '';
+    document.getElementById('amount').value = '';
+    document.getElementById('orderDate').value = new Date().toISOString().slice(0, 10);
+    
+    // 恢复保存按钮
+    const saveBtn = document.querySelector('#ordersTab .btn-primary');
+    saveBtn.textContent = '📦 添加订单';
+    saveBtn.setAttribute('onclick', 'saveOrder()');
+    
+    // 移除取消按钮
+    const cancelBtn = document.getElementById('cancelOrderEditBtn');
+    if (cancelBtn) cancelBtn.remove();
+}        
+
+        async function deleteOrder(id) {
+            if (confirm('确定删除？')) {
+                await supabaseClient.from('orders').delete().eq('id', id);
+                loadOrders();
+            }
+        }
+        
+        function clearOrderFilters() {
+            document.getElementById('orderSearch').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            loadOrders();
+        }
+        
+        function exportOrdersToExcel() {
+            if (!allOrdersForExport || allOrdersForExport.length === 0) {
+                showToast('没有订单数据可导出', true);
+                return;
+            }
+            const exportData = allOrdersForExport.map(o => ({
+                '订单日期': o.order_date,
+                '客户公司': o.customers?.company || o.customers?.name || '',
+                '客户电话': o.customers?.phone || '',
+                '品名': o.product_name,
+                '色号': o.color_code || '',
+                '数量(米)': o.quantity,
+                '单价(元)': o.unit_price,
+                '金额(元)': o.amount
+            }));
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '订单明细');
+            const fileName = `订单明细_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            showToast(`导出成功，共${exportData.length}条订单`);
+        }
+        
+        async function exportCustomersToExcel() {
+            if (!currentUser || !supabaseClient) { showToast('请先登录', true); return; }
+            const search = document.getElementById('custSearch')?.value || '';
+            const levelFilter = document.getElementById('levelFilter')?.value || '';
+            const typeFilter = document.getElementById('typeFilter')?.value || '';
+            let query = supabaseClient.from('customers').select('*');
+            if (!isAdmin()) {
+                if (isManager()) {
+                    const { data: subs } = await supabaseClient.from('users').select('id').eq('role', 'user');
+                    const ids = [currentUser.id, ...(subs?.map(s => s.id) || [])];
+                    query = query.in('user_id', ids);
+                } else {
+                    query = query.eq('user_id', currentUser.id);
+                }
+            }
+            if (search) query = query.or(`company.ilike.%${search}%,name.ilike.%${search}%`);
+            if (levelFilter) query = query.eq('level', levelFilter);
+            if (typeFilter) query = query.eq('type', typeFilter);
+            const { data: customers, error } = await query.order('created_at', { ascending: false });
+            if (error) { showToast('获取数据失败', true); return; }
+            if (!customers || customers.length === 0) { showToast('没有客户数据可导出', true); return; }
+            const typeNameMap = { wholesale: '批发商', design: '设计公司', factory: '家具厂', enduser: '终端用户' };
+            const levelNameMap = { vip: 'VIP', premium: '高级', medium: '中级', potential: '潜在' };
+            const exportData = customers.map(c => {
+                let regionText = '';
+                if (c.region_type === 'domestic') { regionText = `${c.province || ''} ${c.city || ''}`.trim() || '国内'; }
+                else if (c.region_type === 'international') { regionText = `${c.continent || ''} - ${c.country || ''}`.trim() || '国外'; }
+                else { regionText = '—'; }
+                return {
+                    '公司名称': c.company || '—',
+                    '联系人姓名': c.name || '—',
+                    '邮箱': c.email || '—',
+                    '电话': c.phone || '—',
+                    '客户性质': typeNameMap[c.type] || '—',
+                    '区域': regionText,
+                    '客户等级': levelNameMap[c.level] || '—',
+                    '创建日期': c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'
+                };
+            });
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '客户列表');
+            const fileName = `客户列表_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            showToast(`导出成功，共${exportData.length}条客户`);
+        }
+        
+        function exportSummaryToExcel() {
+            if (!currentSummaryData || currentSummaryData.length === 0) { showToast('没有汇总数据可导出', true); return; }
+            const ws = XLSX.utils.json_to_sheet(currentSummaryData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '订单汇总');
+            const fileName = `订单汇总_${currentSummaryType}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+            showToast(`导出成功，共${currentSummaryData.length}条记录`);
+        }
+        
+        // ========== 订单汇总 ==========
+        function initYearSelect() {
+            const currentYear = new Date().getFullYear();
+            const yearSelect = document.getElementById('summaryYear');
+            yearSelect.innerHTML = '';
+            for (let y = currentYear - 3; y <= currentYear + 1; y++) {
+                const selected = (y === currentYear) ? 'selected' : '';
+                yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}年</option>`;
+            }
+            const monthSelect = document.getElementById('summaryMonth');
+            monthSelect.innerHTML = '';
+            const currentMonth = new Date().getMonth() + 1;
+            for (let m = 1; m <= 12; m++) {
+                const selected = (m === currentMonth) ? 'selected' : '';
+                monthSelect.innerHTML += `<option value="${m}" ${selected}>${m}月</option>`;
+            }
+        }
+        
+        function onSummaryTypeChange() {
+            const type = document.getElementById('summaryType').value;
+            const yearGroup = document.getElementById('yearGroup');
+            const monthGroup = document.getElementById('monthGroup');
+            const currentYear = new Date().getFullYear();
+            const summaryYear = document.getElementById('summaryYear');
+            if (summaryYear && summaryYear.value === '') summaryYear.value = currentYear;
+            const currentMonth = new Date().getMonth() + 1;
+            const summaryMonth = document.getElementById('summaryMonth');
+            if (summaryMonth && summaryMonth.value === '') summaryMonth.value = currentMonth;
+            if (type === 'customer_month' || type === 'product_month' || type === 'product_color_month' || type === 'customer_rank_month') {
+                yearGroup.style.display = 'block';
+                monthGroup.style.display = 'block';
+            } else if (type === 'customer_year' || type === 'product_year' || type === 'product_color_year' || type === 'customer_rank_year') {
+                yearGroup.style.display = 'block';
+                monthGroup.style.display = 'none';
+            } else {
+                yearGroup.style.display = 'none';
+                monthGroup.style.display = 'none';
+            }
+            loadSummary();
+        }
+        
+        async function loadSummary() {
+            if (!currentUser || !supabaseClient) return;
+            const type = document.getElementById('summaryType').value;
+            currentSummaryType = type;
+            const year = document.getElementById('summaryYear')?.value;
+            const month = document.getElementById('summaryMonth')?.value;
+            let query = supabaseClient.from('orders').select('*, customers!orders_customer_id_fkey(company, name)');
+            if (!isAdmin()) {
+                if (isManager()) {
+                    const { data: subs } = await supabaseClient.from('users').select('id').eq('role', 'user');
+                    const ids = [currentUser.id, ...(subs?.map(s=>s.id)||[])];
+                    query = query.in('user_id', ids);
+                } else {
+                    query = query.eq('user_id', currentUser.id);
+                }
+            }
+            const { data: allOrders } = await query;
+            let orders = allOrders || [];
+            if (year) orders = orders.filter(o => new Date(o.order_date).getFullYear() == year);
+            if (month && type.includes('month')) orders = orders.filter(o => (new Date(o.order_date).getMonth() + 1) == month);
+            let result = [], title = '', headers = [];
+            if (type === 'customer_month') {
+                title = `📊 客户订单汇总 - ${year}年${month}月`;
+                const customerMap = new Map();
+                orders.forEach(o => { const cn = o.customers?.company || o.customers?.name || '未知客户'; if (!customerMap.has(cn)) customerMap.set(cn, { name: cn, totalAmount: 0, orderCount: 0, totalQuantity: 0 }); const c = customerMap.get(cn); c.totalAmount += (o.amount || 0); c.orderCount += 1; c.totalQuantity += (o.quantity || 0); });
+                result = Array.from(customerMap.values()).sort((a,b) => b.totalAmount - a.totalAmount);
+                headers = ['排名', '客户名称', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '客户名称': r.name, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'customer_year') {
+                title = `📊 客户订单汇总 - ${year}年`;
+                const customerMap = new Map();
+                orders.forEach(o => { const cn = o.customers?.company || o.customers?.name || '未知客户'; if (!customerMap.has(cn)) customerMap.set(cn, { name: cn, totalAmount: 0, orderCount: 0, totalQuantity: 0 }); const c = customerMap.get(cn); c.totalAmount += (o.amount || 0); c.orderCount += 1; c.totalQuantity += (o.quantity || 0); });
+                result = Array.from(customerMap.values()).sort((a,b) => b.totalAmount - a.totalAmount);
+                headers = ['排名', '客户名称', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '客户名称': r.name, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'product_month') {
+                title = `📊 按品名汇总 - ${year}年${month}月`;
+                const productMap = new Map();
+                orders.forEach(o => { const pn = o.product_name || '未知品名'; if (!productMap.has(pn)) productMap.set(pn, { name: pn, totalQuantity: 0, totalAmount: 0, orderCount: 0 }); const p = productMap.get(pn); p.totalQuantity += (o.quantity || 0); p.totalAmount += (o.amount || 0); p.orderCount += 1; });
+                result = Array.from(productMap.values()).sort((a,b) => b.totalQuantity - a.totalQuantity);
+                headers = ['排名', '品名', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '品名': r.name, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'product_year') {
+                title = `📊 按品名汇总 - ${year}年`;
+                const productMap = new Map();
+                orders.forEach(o => { const pn = o.product_name || '未知品名'; if (!productMap.has(pn)) productMap.set(pn, { name: pn, totalQuantity: 0, totalAmount: 0, orderCount: 0 }); const p = productMap.get(pn); p.totalQuantity += (o.quantity || 0); p.totalAmount += (o.amount || 0); p.orderCount += 1; });
+                result = Array.from(productMap.values()).sort((a,b) => b.totalQuantity - a.totalQuantity);
+                headers = ['排名', '品名', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '品名': r.name, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'product_color_month') {
+                title = `📊 按品名+色号汇总 - ${year}年${month}月`;
+                const productColorMap = new Map();
+                orders.forEach(o => { const key = `${o.product_name || '未知品名'}|${o.color_code || '无色号'}`; if (!productColorMap.has(key)) productColorMap.set(key, { product: o.product_name || '未知品名', color: o.color_code || '无色号', totalQuantity: 0, totalAmount: 0, orderCount: 0 }); const p = productColorMap.get(key); p.totalQuantity += (o.quantity || 0); p.totalAmount += (o.amount || 0); p.orderCount += 1; });
+                result = Array.from(productColorMap.values()).sort((a,b) => { if (a.product < b.product) return -1; if (a.product > b.product) return 1; return b.totalQuantity - a.totalQuantity; });
+                headers = ['排名', '品名', '色号', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '品名': r.product, '色号': r.color, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'product_color_year') {
+                title = `📊 按品名+色号汇总 - ${year}年`;
+                const productColorMap = new Map();
+                orders.forEach(o => { const key = `${o.product_name || '未知品名'}|${o.color_code || '无色号'}`; if (!productColorMap.has(key)) productColorMap.set(key, { product: o.product_name || '未知品名', color: o.color_code || '无色号', totalQuantity: 0, totalAmount: 0, orderCount: 0 }); const p = productColorMap.get(key); p.totalQuantity += (o.quantity || 0); p.totalAmount += (o.amount || 0); p.orderCount += 1; });
+                result = Array.from(productColorMap.values()).sort((a,b) => { if (a.product < b.product) return -1; if (a.product > b.product) return 1; return b.totalQuantity - a.totalQuantity; });
+                headers = ['排名', '品名', '色号', '订单数', '总数量(米)', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '品名': r.product, '色号': r.color, '订单数': r.orderCount, '总数量(米)': r.totalQuantity, '总金额(元)': r.totalAmount }));
+            } else if (type === 'customer_rank_month') {
+                title = `📊 客户金额排名 - ${year}年${month}月`;
+                const customerMap = new Map();
+                orders.forEach(o => { const cn = o.customers?.company || o.customers?.name || '未知客户'; if (!customerMap.has(cn)) customerMap.set(cn, { name: cn, totalAmount: 0, orderCount: 0 }); const c = customerMap.get(cn); c.totalAmount += (o.amount || 0); c.orderCount += 1; });
+                result = Array.from(customerMap.values()).sort((a,b) => b.totalAmount - a.totalAmount);
+                headers = ['排名', '客户名称', '订单数', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '客户名称': r.name, '订单数': r.orderCount, '总金额(元)': r.totalAmount }));
+            } else if (type === 'customer_rank_year') {
+                title = `📊 客户金额排名 - ${year}年`;
+                const customerMap = new Map();
+                orders.forEach(o => { const cn = o.customers?.company || o.customers?.name || '未知客户'; if (!customerMap.has(cn)) customerMap.set(cn, { name: cn, totalAmount: 0, orderCount: 0 }); const c = customerMap.get(cn); c.totalAmount += (o.amount || 0); c.orderCount += 1; });
+                result = Array.from(customerMap.values()).sort((a,b) => b.totalAmount - a.totalAmount);
+                headers = ['排名', '客户名称', '订单数', '总金额(元)'];
+                currentSummaryData = result.map((r, idx) => ({ '排名': idx+1, '客户名称': r.name, '订单数': r.orderCount, '总金额(元)': r.totalAmount }));
+            }
+            const totalAmount = result.reduce((s,r) => s + (r.totalAmount || 0), 0);
+            const totalOrders = result.reduce((s,r) => s + (r.orderCount || 0), 0);
+            let html = `<div class="summary-stats"><div class="summary-card"><div class="label">总成交金额</div><div class="value amount-positive">¥${totalAmount.toFixed(2)}</div></div><div class="summary-card"><div class="label">总订单数</div><div class="value">${totalOrders}</div></div><div class="summary-card"><div class="label">记录数</div><div class="value">${result.length}</div></div></div><div class="summary-box"><h4>${title}</h4><div class="table-wrapper"><table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+            if (result.length === 0) { html += '<tr><td colspan="' + headers.length + '" style="text-align:center;">暂无数据</td></tr>'; } else {
+                result.forEach((r, idx) => {
+                    if (type.includes('product_color')) {
+                        html += `<tr><td>${idx+1}</td><td><strong>${escapeHtml(r.product)}</strong></td><td>${escapeHtml(r.color)}</td><td>${r.orderCount}</td><td>${(r.totalQuantity || 0).toFixed(0)}</td><td class="amount-positive">¥${(r.totalAmount || 0).toFixed(2)}</td></tr>`;
+                    } else if (type.includes('product')) {
+                        html += `<tr><td>${idx+1}</td><td><strong>${escapeHtml(r.name)}</strong></td><td>${r.orderCount}</td><td>${(r.totalQuantity || 0).toFixed(0)}</td><td class="amount-positive">¥${(r.totalAmount || 0).toFixed(2)}</td></tr>`;
+                    } else if (type.includes('rank')) {
+                        html += `<tr><td>${idx+1}</td><td><strong>${escapeHtml(r.name)}</strong></td><td>${r.orderCount}</td><td class="amount-positive">¥${(r.totalAmount || 0).toFixed(2)}</td></tr>`;
+                    } else {
+                        html += `<tr><td>${idx+1}</td><td><strong>${escapeHtml(r.name)}</strong></td><td>${r.orderCount}</td><td>${(r.totalQuantity || 0).toFixed(0)}</td><td class="amount-positive">¥${(r.totalAmount || 0).toFixed(2)}</td></tr>`;
+                    }
+                });
+            }
+            html += `</tbody></table></div></div>`;
+            document.getElementById('summaryResult').innerHTML = html;
+        }
+        
+        // ========== 打印销售单相关函数 ==========
+        function convertToChineseAmount(amount) {
+            if (amount === 0) return '零圆整';
+            const cnNums = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
+            const cnIntRadice = ['', '拾', '佰', '仟'];
+            const cnIntUnits = ['', '万', '亿', '兆'];
+            let integerNum = Math.floor(Math.abs(amount));
+            let chineseStr = '';
+            if (integerNum > 0) {
+                let zeroCount = 0;
+                let IntStr = integerNum.toString();
+                for (let i = 0; i < IntStr.length; i++) {
+                    let n = IntStr.substr(i, 1);
+                    let p = IntStr.length - i - 1;
+                    let q = p / 4;
+                    let m = p % 4;
+                    if (n == '0') { zeroCount++; }
+                    else {
+                        if (zeroCount > 0) chineseStr += cnNums[0];
+                        zeroCount = 0;
+                        chineseStr += cnNums[parseInt(n)] + cnIntRadice[m];
+                    }
+                    if (m == 0 && zeroCount < 4) chineseStr += cnIntUnits[q];
+                }
+                chineseStr += '圆';
+            }
+            let decimalNum = Math.round((Math.abs(amount) - integerNum) * 100);
+            if (decimalNum > 0) {
+                let jiao = Math.floor(decimalNum / 10);
+                let fen = decimalNum % 10;
+                if (jiao > 0) chineseStr += cnNums[jiao] + '角';
+                if (fen > 0) chineseStr += cnNums[fen] + '分';
+            } else { chineseStr += '整'; }
+            return chineseStr;
+        }
+        
+        async function printSingleOrder(orderId) {
+    const { data: order } = await supabaseClient.from('orders')
+        .select('*, customers!orders_customer_id_fkey(company, name, phone)')
+        .eq('id', orderId)
+        .single();
+    
+    if (!order) {
+        showToast('获取订单失败', true);
+        return;
+    }
+    
+    const customer = order.customers;
+const logoUrl = localStorage.getItem('invoice_logo') || '';
+const logoHtml = logoUrl ? `<img src="${logoUrl}" style="position:absolute; left:0; top:0; max-width:150px; max-height:100px; object-fit:contain;">` : '<div style="width:150px;height:100px;"></div>';
+const today = new Date().toLocaleDateString('zh-CN');
+
+// 印章（浮在合计金额上方）
+const stampUrl = localStorage.getItem('company_stamp') || '';
+const stampHtml = stampUrl ? `<div style="position: absolute; right: 120px; top: 190px; z-index: 10;"><img src="${stampUrl}" style="width: 4cm; height: 4cm; object-fit: contain;"></div>` : '';const html = `
+    <div style="position:relative; font-family: Arial, '微软雅黑', sans-serif; font-size:12px; max-width:800px; margin:0 auto;">
+        <div style="position:absolute; top:50%; left:45%; transform:translate(-50%,-50%) rotate(-30deg); opacity:0.1; font-size:40px; white-space:nowrap; pointer-events:none; z-index:0;">RAFFINATO</div>
+${stampHtml}
+        <div style="position:relative; z-index:1;">
+            <div style="text-align:center; margin-bottom:20px; position:relative;">
+                ${logoHtml}
+                <div style="font-size:18px; font-weight:bold; margin:10px 0 5px;">瑞菲纳朵面料销售单</div>
+                <div style="font-size:12px; color:#666;">RAFFINATO FABRICS SALES ORDER</div>
+            </div>
+            
+            <!-- 客户信息 -->
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; padding:8px; background:#f5f5f5; border-radius:4px;">
+                <div><strong>客户名称：</strong>${escapeHtml(customer?.company || customer?.name || '')}</div>
+                <div><strong>联系人：</strong>${escapeHtml(customer?.name || '')}</div>
+                <div><strong>电话：</strong>${escapeHtml(customer?.phone || '')}</div>
+                <div><strong>日期：</strong>${today}</div>
+            </div>
+            
+            <!-- 订单表格 -->
+            <table style="width:100%; border-collapse:collapse; margin:15px 0;">
+    <thead>
+        <tr style="background:#f0f0f0;">
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">序号</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">产品型号</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">色号</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">数量(米)</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">单价(元)</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">金额(元)</th>
+            <th style="border:1px solid #ddd; padding:8px; text-align:center;">备注</th>
+         </tr>
+    </thead>
+    <tbody>
+         <tr>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">1</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${escapeHtml(order.product_name || '')}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${escapeHtml(order.color_code || '')}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${order.quantity || 0}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${order.unit_price || 0}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">${(order.amount || 0).toFixed(2)}</td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;"><textarea rows="2" style="width:100%; min-height:50px; border:none; resize:vertical; text-align:center;"></textarea></td>
+         </tr>
+        <tr style="font-weight:bold; background:#f9f9f9;">
+            <td colspan="5" style="border:1px solid #ddd; padding:8px; text-align:right;"><strong>合计：</strong></td>
+            <td style="border:1px solid #ddd; padding:8px; text-align:center;">
+                <strong>¥${(order.amount || 0).toFixed(2)}</strong>
+                ${stampHtml}
+            </td>
+            <td style="border:1px solid #ddd; padding:8px;"></td>
+         </tr>
+    </tbody>
+</table>
+            
+            <div style="margin:15px 0; padding:8px; background:#f5f5f5; border-radius:4px;">
+                <strong>大写金额：</strong>${convertToChineseAmount(order.amount || 0)}
+            </div>
+            
+            <div style="margin-top:20px; font-size:10px; color:#999; text-align:left; border-top:1px solid #eee; padding-top:10px;">
+                请注意：客户在收到货物后应核对面料型号、色号、品质、数量等，如有异议请在7日内提出，逾期概不负责。
+            </div>
+        </div>
+    </div>
+`;
+
+    
+   // 检测是否为手机端
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        // 手机端：显示在弹窗中
+        document.getElementById('salesOrderContent').innerHTML = html;
+        document.getElementById('salesOrderModal').style.display = 'flex';
+    } else {
+        // 电脑端：打开新窗口打印
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>瑞菲纳朵面料销售单</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: Arial, '微软雅黑', sans-serif; font-size: 12px; padding: 20px; background: white; }
+                    .no-print { text-align: center; margin-top: 20px; }
+                    .no-print button { padding: 8px 20px; margin: 5px; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; }
+                    .warning-message { text-align: center; margin-top: 10px; font-size: 11px; color: #999; }
+                    @media print { .no-print { display: none; } .warning-message { display: none; } body { padding: 0; } }
+                </style>
+                <script>
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
+                            e.preventDefault();
+                            alert('请使用打印按钮打印，不要刷新页面');
+                            return false;
+                        }
+                    });
+                    document.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                <\/script>
+            </head>
+            <body>
+                ${html}
+                <div class="no-print">
+                    <button onclick="window.print()">🖨 打印</button>
+                    <button onclick="window.close()">关闭</button>
+                </div>
+                <div class="warning-message">
+                    💡 提示：请勿刷新页面，使用"打印"按钮或直接关闭窗口
+                </div>
+            </body>
+            </html>
+        `);
+        win.document.close();
+    }
+}
+        function printSalesOrderPDF() {
+            const printContent = document.getElementById('salesOrderContent').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html><head><title>瑞菲纳朵面料销售单</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:Arial,'微软雅黑',sans-serif;font-size:12px;padding:20px;}.no-print{text-align:center;margin-top:20px;}.no-print button{padding:8px 20px;margin:5px;cursor:pointer;}@media print{.no-print{display:none;}}</style></head><body>${printContent}<div class="no-print"><button onclick="window.print()">🖨️ 打印</button><button onclick="window.close()">关闭</button></div></body></html>
+            `);
+            printWindow.document.close();
+        }
+        
+        function closeSalesOrderModal() {
+            document.getElementById('salesOrderModal').style.display = 'none';
+        }
+        
+        // ========== 用户管理 ==========
+        async function loadUsers() {
+            if (!isAdmin()) return;
+            const { data: users } = await supabaseClient.from('users').select('*');
+            const { data: customers } = await supabaseClient.from('customers').select('user_id');
+            const { data: orders } = await supabaseClient.from('orders').select('user_id');
+            const custMap = {}, orderMap = {};
+            customers?.forEach(c => custMap[c.user_id] = (custMap[c.user_id]||0)+1);
+            orders?.forEach(o => orderMap[o.user_id] = (orderMap[o.user_id]||0)+1);
+            document.getElementById('usersTable').innerHTML = (users||[]).map(u => `
+                <tr><td>${escapeHtml(u.username)}</td><td>${u.role==='admin'?'管理员':(u.role==='manager'?'主管':'业务人员')}</td><td>${custMap[u.id]||0}</td><td>${orderMap[u.id]||0}</td><td>${u.role!=='admin' ? `<button class="btn-sm" onclick="deleteUser(${u.id})">删除</button>` : '—'}</td></tr>
+            `).join('');
+        }
+        
+        async function createUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const role = document.getElementById('newRole').value;
+            if (!username || !password) { showToast('请填写用户名密码', true); return; }
+            await supabaseClient.from('users').insert([{ username, password, nickname: username, role }]);
+            showToast('创建成功');
+            loadUsers();
+        }
+        
+        async function deleteUser(id) {
+            if (confirm('删除用户会同时删除其所有客户和订单')) {
+                await supabaseClient.from('customers').delete().eq('user_id', id);
+                await supabaseClient.from('orders').delete().eq('user_id', id);
+                await supabaseClient.from('users').delete().eq('id', id);
+                loadUsers(); loadCustomers(); loadOrders();
+            }
+        }
+        
+// 加载自产面料价格表
+async function loadDomesticPrices() {
+    const tableName = currentDomesticCurrency === 'cny' ? 'domestic_prices_cny' : 'domestic_prices_usd';
+    const { data, error } = await supabaseClient.from(tableName).select('*').order('model');
+    const tbody = document.getElementById('domesticPriceBody');
+    
+    if (error || !data || data.length === 0) {
+        tbody.innerHTML = '=<td colspan="9" style="text-align:center;">暂无数据，请管理员上传价格表';
+        return;
+    }
+    
+    // 关键：检查这里的 HTML 拼接
+    tbody.innerHTML = data.map((item, index) => `
+        <tr>
+            <td style="text-align:center;">${index + 1}</td>
+            <td style="text-align:center;">${escapeHtml(item.model)}</td>
+            <td style="text-align:center;">${escapeHtml(item.width || '—')}</td>
+            <td style="text-align:center;">${item.fabric_weight || '—'}</td>
+            <td style="text-align:center;">${item.composite_weight || '—'}</td>
+            <td style="text-align:center;">${item.total_weight || '—'}</td>
+            <td style="text-align:center;">${escapeHtml(item.composition || '—')}</td>
+            <td style="text-align:center;">${item.roll_price || '—'}</td>
+            <td style="text-align:center;">${item.cut_price || '—'}</td>
+        </tr>
+    `).join('');
+// 更新时间显示（移到这里）
+    const latest = data[0]?.created_at;
+    if (latest) {
+        const updateTimeElem = document.getElementById('domesticUpdateTime');
+        if (updateTimeElem) {
+            updateTimeElem.innerText = new Date(latest).toLocaleString();
+        }
+    }
+}
+
+
+
+       function switchTab(tab) {
+    // 隐藏所有标签页
+    document.getElementById('customersTab').style.display = 'none';
+    document.getElementById('ordersTab').style.display = 'none';
+    document.getElementById('summaryTab').style.display = 'none';
+    document.getElementById('usersTab').style.display = 'none';
+    document.getElementById('domesticPriceTab').style.display = 'none';
+    document.getElementById('importPriceTab').style.display = 'none';
+    
+    // 显示选中的标签页
+    if (tab === 'customers') document.getElementById('customersTab').style.display = 'block';
+    if (tab === 'orders') document.getElementById('ordersTab').style.display = 'block';
+    if (tab === 'summary') document.getElementById('summaryTab').style.display = 'block';
+    if (tab === 'users') document.getElementById('usersTab').style.display = 'block';
+    if (tab === 'domesticPrice') document.getElementById('domesticPriceTab').style.display = 'block';
+    if (tab === 'importPrice') document.getElementById('importPriceTab').style.display = 'block';
+    
+    // 更新菜单高亮
+    const menuItems = document.querySelectorAll('.sidebar-menu-item');
+    const menuIndex = {
+        'customers': 0,
+        'orders': 1,
+        'summary': 2,
+        'domesticPrice': 3,
+        'importPrice': 4,
+        'users': 5
+    };
+    
+    menuItems.forEach((item, index) => {
+        if (index === menuIndex[tab]) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+    
+    // 加载数据
+    if (tab === 'orders') loadOrders();
+    if (tab === 'summary') {
+        const summaryType = document.getElementById('summaryType');
+        if (summaryType && summaryType.value !== 'customer_month') summaryType.value = 'customer_month';
+        if (typeof onSummaryTypeChange === 'function') onSummaryTypeChange();
+    }
+    if (tab === 'domesticPrice') {
+        if (typeof updatePriceHeader === 'function') updatePriceHeader();
+        if (typeof loadDomesticPrices === 'function') loadDomesticPrices();
+        const uploadBtn = document.getElementById('uploadDomesticBtn');
+        if (uploadBtn) uploadBtn.style.display = isAdmin() ? 'inline-block' : 'none';
+    }
+    if (tab === 'importPrice') {
+        if (typeof updatePriceHeader === 'function') updatePriceHeader();
+        if (typeof loadImportPrices === 'function') loadImportPrices();
+        const uploadBtn = document.getElementById('uploadImportBtn');
+        if (uploadBtn) uploadBtn.style.display = isAdmin() ? 'inline-block' : 'none';
+    }
+    if (tab === 'users' && isAdmin()) loadUsers();
+}
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+        
+        initProvinceSelect();
+        loadSavedLogo();
+        loadCustomerSearchList();
+initCustomerSearch();
+       loadInvoiceLogoPreview();
+// ========== 自动恢复登录状态（刷新页面保持登录）==========
+const savedUser = sessionStorage.getItem('crm_user');
+if (savedUser) {
+    try {
+        currentUser = JSON.parse(savedUser);
+        if (currentUser && currentUser.id) {
+            console.log('恢复登录用户:', currentUser.username);
+            
+            // 恢复界面显示
+            document.getElementById('sidebarUserName').innerText = currentUser.nickname || currentUser.username;
+            const badge = document.getElementById('sidebarRoleBadge');
+            badge.innerText = currentUser.role === 'admin' ? '管理员' : (currentUser.role === 'manager' ? '主管' : '业务人员');
+            badge.className = `role-badge role-${currentUser.role}`;
+            
+            // 管理员显示用户管理菜单
+            if (currentUser.role === 'admin') {
+                document.getElementById('userMgmtTab').style.display = 'flex';
+                document.getElementById('logoPlaceholder').style.cursor = 'pointer';
+                document.getElementById('logoPlaceholder').onclick = () => document.getElementById('logoUpload').click();
+            }
+            
+            // 切换显示
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            
+            // 重新加载数据
+            loadCustomers();
+            loadOrders();
+            initYearSelect();
+            if (currentUser.role === 'admin') loadUsers();
+        } else {
+            console.log('用户数据无效');
+        }
+    } catch(e) {
+        console.error('恢复登录失败:', e);
+        sessionStorage.removeItem('crm_user');
+    }
+}
+    // ========== 销售单Logo上传功能 ==========
+
+// 销售单Logo上传
+function uploadInvoiceLogo(input) {
+    if (!isAdmin()) {
+        showToast('只有管理员可以上传销售单Logo', true);
+        return;
+    }
+    if (input.files?.[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const logoData = e.target.result;
+            localStorage.setItem('invoice_logo', logoData);
+            document.getElementById('invoiceLogoPreview').src = logoData;
+            document.getElementById('invoiceLogoPreview').style.display = 'block';
+            document.getElementById('clearInvoiceLogoBtn').style.display = 'inline-block';
+            showToast('销售单Logo上传成功');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// 清除销售单Logo
+function clearInvoiceLogo() {
+    if (!isAdmin()) {
+        showToast('只有管理员可以清除销售单Logo', true);
+        return;
+    }
+    localStorage.removeItem('invoice_logo');
+    document.getElementById('invoiceLogoPreview').style.display = 'none';
+    document.getElementById('clearInvoiceLogoBtn').style.display = 'none';
+    showToast('销售单Logo已清除');
+}
+
+// 加载销售单Logo预览
+function loadInvoiceLogoPreview() {
+    const savedLogo = localStorage.getItem('invoice_logo');
+    if (savedLogo) {
+        document.getElementById('invoiceLogoPreview').src = savedLogo;
+        document.getElementById('invoiceLogoPreview').style.display = 'block';
+        document.getElementById('clearInvoiceLogoBtn').style.display = 'inline-block';
+    }
+}
+// ========== 客户搜索下拉框 ==========
+
+async function loadCustomerSearchList() {
+    console.log('加载客户列表...');
+    const { data: customers } = await supabaseClient.from('customers').select('id,company,name').order('company');
+    allCustomersList = customers || [];
+    console.log('客户数量:', allCustomersList.length);
+    
+    // 如果有搜索输入框，刷新显示
+    const searchInput = document.getElementById('orderCustomerInput');
+    if (searchInput) {
+        renderCustomerDropdownList(searchInput.value);
+    } else {
+        renderCustomerDropdownList('');
+    }
+}
+
+function renderCustomerDropdownList(searchText) {
+    const searchLower = searchText.toLowerCase();
+    const filtered = allCustomersList.filter(c => {
+        const displayName = c.company && c.company.trim() !== '' ? c.company : c.name;
+        return displayName.toLowerCase().includes(searchLower);
+    });
+    
+    const listDiv = document.getElementById('orderCustomerDropdownList');
+    if (!listDiv) return;
+    
+    if (filtered.length === 0) {
+        listDiv.innerHTML = '<div style="padding: 8px; color: #999;">未找到客户</div>';
+    } else {
+        listDiv.innerHTML = filtered.map(c => {
+            const displayName = c.company && c.company.trim() !== '' ? c.company : c.name;
+            return `<div data-id="${c.id}" data-name="${escapeHtml(displayName)}" style="padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;">${escapeHtml(displayName)}</div>`;
+        }).join('');
+        
+        // 绑定点击事件
+        listDiv.querySelectorAll('div[data-id]').forEach(div => {
+            div.onclick = function(e) {
+                e.stopPropagation();
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                document.getElementById('orderCustomerInput').value = name;
+                document.getElementById('orderCustomer').value = id;
+                document.getElementById('orderCustomerDropdownList').style.display = 'none';
+                console.log('选中客户:', name, 'ID:', id);
+            };
+        });
+    }
+}
+
+// 初始化客户搜索框事件
+function initCustomerSearch() {
+    const input = document.getElementById('orderCustomerInput');
+    const dropdownBtn = document.getElementById('orderCustomerDropdownBtn');
+    const dropdownList = document.getElementById('orderCustomerDropdownList');
+    
+    if (!input || !dropdownBtn) {
+        console.error('客户搜索元素未找到');
+        return;
+    }
+    
+    console.log('初始化客户搜索...');
+    
+    // 输入时搜索
+    input.oninput = function() {
+        const val = this.value;
+        console.log('输入搜索:', val);
+        renderCustomerDropdownList(val);
+        dropdownList.style.display = 'block';
+    };
+    
+    // 点击下拉按钮
+    dropdownBtn.onclick = function(e) {
+        e.stopPropagation();
+        console.log('点击下拉按钮');
+        renderCustomerDropdownList(input.value);
+        dropdownList.style.display = dropdownList.style.display === 'block' ? 'none' : 'block';
+    };
+    
+    // 点击输入框时显示下拉
+    input.onclick = function(e) {
+        e.stopPropagation();
+        renderCustomerDropdownList(this.value);
+        dropdownList.style.display = 'block';
+    };
+    
+    // 点击其他地方关闭下拉框
+    document.addEventListener('click', function(e) {
+        if (dropdownList && !input.contains(e.target) && !dropdownBtn.contains(e.target) && !dropdownList.contains(e.target)) {
+            dropdownList.style.display = 'none';
+        }
+    });
+}
+// 印章上传
+function uploadStamp(input) {
+    if (!isAdmin()) {
+        showToast('只有管理员可以上传印章', true);
+        return;
+    }
+    if (input.files?.[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const stampData = e.target.result;
+            localStorage.setItem('company_stamp', stampData);
+            document.getElementById('stampPreview').src = stampData;
+            document.getElementById('stampPreview').style.display = 'block';
+            document.getElementById('clearStampBtn').style.display = 'inline-block';
+            showToast('印章上传成功');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// 清除印章
+function clearStamp() {
+    if (!isAdmin()) {
+        showToast('只有管理员可以清除印章', true);
+        return;
+    }
+    localStorage.removeItem('company_stamp');
+    document.getElementById('stampPreview').style.display = 'none';
+    document.getElementById('clearStampBtn').style.display = 'none';
+    showToast('印章已清除');
+}
+
+// 加载印章预览
+function loadStampPreview() {
+    const savedStamp = localStorage.getItem('company_stamp');
+    if (savedStamp) {
+        document.getElementById('stampPreview').src = savedStamp;
+        document.getElementById('stampPreview').style.display = 'block';
+        document.getElementById('clearStampBtn').style.display = 'inline-block';
+    }
+}
+// ========== 价格表功能 ==========
+
+// 更新价格表日期和Logo
+function updatePriceHeader() {
+    const today = new Date().toLocaleDateString('zh-CN');
+    document.getElementById('domesticPriceDate').innerText = today;
+    document.getElementById('importPriceDate').innerText = today;
+    
+    // const logoUrl = localStorage.getItem('invoice_logo') || '';
+     // const logoHtml = logoUrl ? `<img src="${logoUrl}" style="max-width:150px; max-height:100px; object-fit:contain;">` : '';
+    // document.getElementById('domesticPriceLogo').innerHTML = logoHtml;
+    // document.getElementById('importPriceLogo').innerHTML = logoHtml;
+}
+
+   
+// 切换自产面料货币显示（人民币/美金）
+function switchDomesticCurrency(currency) {
+    currentDomesticCurrency = currency;
+    
+    // 更新按钮样式
+    const cnyBtn = document.getElementById('domesticPriceCny');
+    const usdBtn = document.getElementById('domesticPriceUsd');
+    
+    if (cnyBtn) {
+        cnyBtn.style.background = currency === 'cny' ? '#667eea' : '';
+        cnyBtn.style.color = currency === 'cny' ? 'white' : '';
+    }
+    if (usdBtn) {
+        usdBtn.style.background = currency === 'usd' ? '#667eea' : '';
+        usdBtn.style.color = currency === 'usd' ? 'white' : '';
+    }
+    
+    // 重新加载数据
+    loadDomesticPrices();
+}
+
+// 加载进口面料价格表
+async function loadImportPrices() {
+    const { data, error } = await supabaseClient.from('import_prices').select('*').order('model');  // supabase 改为 supabaseClient
+    const tbody = document.getElementById('importPriceBody');
+    
+    if (error || !data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">暂无数据，请管理员上传价格表</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = data.map((item, index) => `
+        <tr>
+            <td>${index + 1}</td>
+            <td>${escapeHtml(item.model)}</td>
+            <td>${escapeHtml(item.width || '—')}</td>
+            <td>${item.sale_price !== null && item.sale_price !== 0 ? item.sale_price : '—'}</td>
+            <td>${item.dealer_price !== null && item.dealer_price !== 0 ? item.dealer_price : '—'}</td>
+            <td>${item.channel_price !== null && item.channel_price !== 0 ? item.channel_price : '—'}</td>
+            <td>${item.sample_price !== null && item.sample_price !== 0 ? item.sample_price : '—'}</td>
+        </tr>
+    `).join('');
+    
+    const latest = data[0]?.created_at;
+    if (latest) {
+        document.getElementById('importUpdateTime').innerText = new Date(latest).toLocaleString();
+    }
+}
+
+// 上传价格表
+async function uploadPriceFile(type) {
+    if (!isAdmin()) {
+        showToast('只有管理员可以上传价格表', true);
+        return;
+    }
+    
+    let targetCurrency = 'cny';
+    if (type === 'domestic') {
+        targetCurrency = confirm('上传人民币报价？点"确定"上传人民币，点"取消"上传美金') ? 'cny' : 'usd';
+    }
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv, .xlsx, .xls';
+    input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        showToast('解析文件中...');
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        
+        if (rows.length < 2) {
+            showToast('文件至少需要包含表头和数据行', true);
+            return;
+        }
+        
+        if (type === 'domestic') {
+            const tableName = targetCurrency === 'cny' ? 'domestic_prices_cny' : 'domestic_prices_usd';
+            const dataToInsert = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row[0]) continue;
+                dataToInsert.push({
+    model: row[0]?.toString() || '',        // 第1列：型号
+    width: row[1]?.toString() || '',         // 第2列：幅宽
+    fabric_weight: parseFloat(row[2]) || 0,  // 第3列：面料克重
+    composite_weight: parseFloat(row[3]) || 0, // 第4列：复合克重
+    total_weight: parseFloat(row[4]) || 0,   // 第5列：总克重
+    composition: row[5]?.toString() || '',   // 第6列：成分
+    roll_price: parseFloat(row[6]) || 0,     // 第7列：卷价
+    cut_price: parseFloat(row[7]) || 0       // 第8列：零剪价格
+});
+            }
+            
+            await supabaseClient.from(tableName).delete().neq('id', 0);
+            if (dataToInsert.length > 0) {
+                const { error } = await supabaseClient.from(tableName).insert(dataToInsert);
+                if (error) {
+                    showToast('上传失败: ' + error.message, true);
+                    return;
+                }
+            }
+            showToast(`上传成功，共${dataToInsert.length}条数据`);
+            loadDomesticPrices();
+        }
+    };
+    input.click();
+}
+
+// 下载价格表
+async function downloadPriceFile(type, currency) {
+    let data = [];
+    let fileName = '';
+    let sheetName = '';
+    
+    if (type === 'domestic') {
+        // 根据货币选择对应的表
+        const tableName = currency === 'cny' ? 'domestic_prices_cny' : 'domestic_prices_usd';
+        const { data: prices, error } = await supabaseClient.from(tableName).select('*').order('model');
+        
+        if (error) {
+            showToast('获取数据失败: ' + error.message, true);
+            return;
+        }
+        if (!prices || prices.length === 0) {
+            showToast('暂无数据可下载', true);
+            return;
+        }
+        
+        // 根据货币设置文件名和表头
+        if (currency === 'cny') {
+            data = prices.map((p, index) => ({
+                '序号': index + 1,
+                '型号': p.model,
+                '幅宽': p.width || '',
+                '面料克重(GSM)': p.fabric_weight || '',
+                '复合克重(GSM)': p.composite_weight || '',
+                '总克重(GSM)': p.total_weight || '',
+                '成分': p.composition || '',
+                '卷价(元/米)': p.roll_price || '',
+                '零剪价格(元/米)': p.cut_price || ''
+            }));
+            fileName = 'Raffinato价格目录表_人民币.xlsx';
+            sheetName = 'Raffinato价格目录_人民币';
+        } else {
+            data = prices.map((p, index) => ({
+                'No.': index + 1,
+                'Item': p.model,
+                'Width': p.width || '',
+                'Fabric Weight (GSM)': p.fabric_weight || '',
+                'Backing Weight (GSM)': p.composite_weight || '',
+                'Total Weight (GSM)': p.total_weight || '',
+                'Composition': p.composition || '',
+                'Roll Price (USD)': p.roll_price || '',
+                'Cut Price (USD)': p.cut_price || ''
+            }));
+            fileName = 'Raffinato_Price_List_USD.xlsx';
+            sheetName = 'Raffinato Price List USD';
+        }
+        
+    } else if (type === 'import') {
+        // 进口面料（保持不变，只有中文版）
+        const { data: prices, error } = await supabaseClient.from('import_prices').select('*').order('model');
+        
+        if (error) {
+            showToast('获取数据失败: ' + error.message, true);
+            return;
+        }
+        if (!prices || prices.length === 0) {
+            showToast('暂无数据可下载', true);
+            return;
+        }
+        
+        data = prices.map((p, index) => ({
+            '序号': index + 1,
+            '型号': p.model,
+            '幅宽': p.width || '',
+            '销售价格(元/米)': p.sale_price || '',
+            '经销商价格(元/米)': p.dealer_price || '',
+            '渠道价格(元/米)': p.channel_price || '',
+            '样卡价格(元/个)': p.sample_price || ''
+        }));
+        fileName = 'Raffinato进口面料价格表_中国内地市场.xlsx';
+        sheetName = 'Raffinato进口面料价格表';
+    }
+    
+    // 创建 Excel 并下载
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, fileName);
+    showToast('下载成功');
+}
+</script>
+</body>
+</html>
