@@ -644,21 +644,28 @@
             <div class="price-title">Raffinato进口面料价格目录表</div>
             <div class="price-date" id="importPriceDate"></div>
         </div>
+        
         <div class="price-buttons">
             <button class="btn btn-success" onclick="downloadPriceFile('import', 'cn')">📎 下载中国内地市场价格表</button>
             <button class="btn btn-primary" id="uploadImportBtn" style="display:none;" onclick="uploadPriceFile('import')">📤 上传更新价格表</button>
         </div>
+        
         <div class="price-table-wrapper">
             <table id="importPriceTable">
-                <thead><tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>销售价格(元/米)</th><th>经销商价格(元/米)</th><th>渠道价格(元/米)</th><th>样卡价格(元/个)</th></tr></thead>
+                <thead>
+                    <tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>销售价格(元/米)</th><th>经销商价格(元/米)</th><th>渠道价格(元/米)</th><th>样卡价格(元/个)</th></tr>
+                </thead>
                 <tbody id="importPriceBody"></tbody>
-             </table>
+            </table>
         </div>
-        <div style="margin-top:10px; font-size:12px; color:#666; text-align:right;">最后更新：<span id="importUpdateTime">—</span></div>
+        
+        <div style="margin-top:10px; font-size:12px; color:#666; text-align:right;">
+            最后更新：<span id="importUpdateTime">—</span>
+        </div>
     </div>
 </div>
 
-              <!-- 用户管理 -->
+<!-- 用户管理 -->
 <div id="usersTab" style="display:none;">
     <div class="form-card">
         <div class="form-grid">
@@ -678,7 +685,7 @@
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th>用户名</th><th>权限</th><th>客户数</th><th>订单数</th><th>操作</th> </>
+                <tr><th>用户名</th><th>权限</th><th>客户数</th><th>订单数</th><th>操作</th></tr>
             </thead>
             <tbody id="usersTable"></tbody>
         </table>
@@ -686,37 +693,26 @@
     
     <!-- 销售单Logo设置 -->
     <div class="form-card" style="margin-top:1rem;">
-        <h3 style="margin-bottom:1rem;">🖼️ 销售单Logo设置</h3>
-        <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
-            <img id="invoiceLogoPreview" style="max-width:120px; max-height:60px; object-fit:contain; border:1px solid #ddd; border-radius:4px; display:none;">
+        <h3>🖼️ 销售单Logo设置</h3>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <img id="invoiceLogoPreview" style="max-width:120px; max-height:60px; display:none;">
             <button class="btn btn-primary" onclick="document.getElementById('invoiceLogoUpload').click()">📎 上传销售单Logo</button>
             <button class="btn" onclick="clearInvoiceLogo()" id="clearInvoiceLogoBtn" style="display:none;">🗑️ 清除</button>
             <input type="file" id="invoiceLogoUpload" accept="image/*" style="display:none;" onchange="uploadInvoiceLogo(this)">
-        </div>
-        <div style="margin-top:8px; font-size:12px; color:#666;">
-            建议尺寸：宽80-180px，高40-80px，透明背景PNG最佳
         </div>
     </div>
     
     <!-- 公司印章设置 -->
     <div class="form-card" style="margin-top:1rem;">
-        <h3 style="margin-bottom:1rem;">🔏 公司印章设置</h3>
-        <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
-            <img id="stampPreview" style="max-width:100px; max-height:100px; object-fit:contain; border:1px solid #ddd; border-radius:4px; display:none;">
+        <h3>🔏 公司印章设置</h3>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <img id="stampPreview" style="max-width:100px; max-height:100px; display:none;">
             <button class="btn btn-primary" onclick="document.getElementById('stampUpload').click()">📎 上传印章</button>
             <button class="btn" onclick="clearStamp()" id="clearStampBtn" style="display:none;">🗑️ 清除</button>
             <input type="file" id="stampUpload" accept="image/*" style="display:none;" onchange="uploadStamp(this)">
         </div>
-        <div style="margin-top:8px; font-size:12px; color:#666;">
-            建议尺寸：80-100px，透明背景PNG最佳，圆形印章效果更好
-        </div>
     </div>
 </div>
-            </div>
-        </div>
-    </div>
-    <div id="toast" class="toast" style="display:none;"></div>
-
     <!-- 销售单弹窗 -->
     <div id="salesOrderModal" class="sales-order-modal">
         <div class="sales-order-content">
@@ -727,7 +723,7 @@
             </div>
         </div>
     </div>
-
+<div id="toast" class="toast" style="display:none;"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
@@ -1721,7 +1717,14 @@ ${stampHtml}
                     .no-print button { padding: 8px 20px; margin: 5px; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; background: #f5f5f5; }
                     .warning-message { text-align: center; margin-top: 10px; font-size: 11px; color: #999; }
                     @media print { .no-print { display: none; } .warning-message { display: none; } body { padding: 0; } }
-                </style>
+                
+/* 确保用户管理独立显示 */
+#usersTab {
+    margin-top: 20px;
+    clear: both;
+    display: none;
+}
+</style>
                 <script>
                     document.addEventListener('keydown', function(e) {
                         if (e.key === 'F5' || (e.ctrlKey && e.key === 'r') || (e.metaKey && e.key === 'r')) {
@@ -1839,17 +1842,17 @@ async function loadDomesticPrices() {
     document.getElementById('customersTab').style.display = 'none';
     document.getElementById('ordersTab').style.display = 'none';
     document.getElementById('summaryTab').style.display = 'none';
-    document.getElementById('usersTab').style.display = 'none';
     document.getElementById('domesticPriceTab').style.display = 'none';
     document.getElementById('importPriceTab').style.display = 'none';
+    document.getElementById('usersTab').style.display = 'none';
     
-    // 显示选中的标签页
+    // 显示选中的
     if (tab === 'customers') document.getElementById('customersTab').style.display = 'block';
     if (tab === 'orders') document.getElementById('ordersTab').style.display = 'block';
     if (tab === 'summary') document.getElementById('summaryTab').style.display = 'block';
-    if (tab === 'users') document.getElementById('usersTab').style.display = 'block';
     if (tab === 'domesticPrice') document.getElementById('domesticPriceTab').style.display = 'block';
     if (tab === 'importPrice') document.getElementById('importPriceTab').style.display = 'block';
+    if (tab === 'users') document.getElementById('usersTab').style.display = 'block';
     
     // 更新菜单高亮
     const menuItems = document.querySelectorAll('.sidebar-menu-item');
@@ -2201,22 +2204,20 @@ async function uploadPriceFile(type) {
         const workbook = XLSX.read(data);
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        // ========== 添加调试代码 ==========
+        
         console.log('=== 上传文件调试信息 ===');
         console.log('文件类型:', type);
         console.log('行数:', rows.length);
         console.log('表头(第1行):', rows[0]);
-        console.log('第1行数据:', rows[1]);
-        if (rows[2]) console.log('第2行数据:', rows[2]);
+        if (rows[1]) console.log('第1行数据:', rows[1]);
         console.log('========================');
-        // ========== 调试代码结束 ========== 
-
+        
         if (rows.length < 2) {
             showToast('文件至少需要包含表头和数据行', true);
             return;
         }
         
+        // ========== 自产面料处理 ==========
         if (type === 'domestic') {
             const tableName = targetCurrency === 'cny' ? 'domestic_prices_cny' : 'domestic_prices_usd';
             const dataToInsert = [];
@@ -2224,15 +2225,15 @@ async function uploadPriceFile(type) {
                 const row = rows[i];
                 if (!row[0]) continue;
                 dataToInsert.push({
-    model: row[0]?.toString() || '',        // 第1列：型号
-    width: row[1]?.toString() || '',         // 第2列：幅宽
-    fabric_weight: parseFloat(row[2]) || 0,  // 第3列：面料克重
-    composite_weight: parseFloat(row[3]) || 0, // 第4列：复合克重
-    total_weight: parseFloat(row[4]) || 0,   // 第5列：总克重
-    composition: row[5]?.toString() || '',   // 第6列：成分
-    roll_price: parseFloat(row[6]) || 0,     // 第7列：卷价
-    cut_price: parseFloat(row[7]) || 0       // 第8列：零剪价格
-});
+                    model: row[0]?.toString() || '',
+                    width: row[1]?.toString() || '',
+                    fabric_weight: parseFloat(row[2]) || 0,
+                    composite_weight: parseFloat(row[3]) || 0,
+                    total_weight: parseFloat(row[4]) || 0,
+                    composition: row[5]?.toString() || '',
+                    roll_price: parseFloat(row[6]) || 0,
+                    cut_price: parseFloat(row[7]) || 0
+                });
             }
             
             await supabaseClient.from(tableName).delete().neq('id', 0);
@@ -2245,11 +2246,42 @@ async function uploadPriceFile(type) {
             }
             showToast(`上传成功，共${dataToInsert.length}条数据`);
             loadDomesticPrices();
+            
+        // ========== 进口面料处理 ==========
+        } else if (type === 'import') {
+            const dataToInsert = [];
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                if (!row[0]) continue;
+                dataToInsert.push({
+                    model: row[0]?.toString() || '',
+                    width: row[1]?.toString() || '',
+                    sale_price: parseFloat(row[2]) || 0,
+                    dealer_price: parseFloat(row[3]) || 0,
+                    channel_price: parseFloat(row[4]) || 0,
+                    sample_price: parseFloat(row[5]) || 0
+                });
+            }
+            
+            console.log('待插入数据条数:', dataToInsert.length);
+            
+            // 删除旧数据
+            await supabaseClient.from('import_prices').delete().neq('id', 0);
+            
+            // 插入新数据
+            if (dataToInsert.length > 0) {
+                const { error } = await supabaseClient.from('import_prices').insert(dataToInsert);
+                if (error) {
+                    showToast('上传失败: ' + error.message, true);
+                    return;
+                }
+            }
+            showToast(`上传成功，共${dataToInsert.length}条数据`);
+            loadImportPrices();
         }
     };
     input.click();
 }
-
 // 下载价格表
 async function downloadPriceFile(type, currency) {
     let data = [];
