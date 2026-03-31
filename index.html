@@ -504,6 +504,7 @@
                             <div class="input-group" id="continentGroup" style="display:none;"><label>大洲</label><select id="continent"><option value="亚洲">亚洲</option><option value="欧洲">欧洲</option><option value="北美洲">北美洲</option><option value="南美洲">南美洲</option><option value="大洋洲">大洋洲</option><option value="非洲">非洲</option></select></div>
                             <div class="input-group" id="countryGroup" style="display:none;"><label>国家</label><input type="text" id="country" placeholder="国家名称"></div>
                             <div class="input-group"><label>客户等级</label><select id="custLevel"><option value="vip">VIP</option><option value="premium">高级</option><option value="medium">中级</option><option value="potential">潜在</option></select></div>
+<div class="input-group"><label>备注</label><textarea id="custNotes" rows="2" placeholder="备注信息..." style="width:100%; padding:0.5rem; border-radius:0.6rem; border:1px solid #e2e8f0; resize:vertical;"></textarea></div>
                             <div><button class="btn btn-primary" onclick="saveCustomer()">添加客户</button></div>
                         </div>
                     </div>
@@ -523,6 +524,7 @@
         <th>性质</th>
         <th>区域</th>
         <th>等级</th>
+        <th>备注</th>
         <th>创建人</th>
         <th>操作</th>
      </>
@@ -777,7 +779,7 @@
         }
         
         function loadSavedLogo() {
-            const saved = localStorage.getItem('company_logo');
+            const saved = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/crmlogo.png';
             if (saved) {
                 document.getElementById('companyLogo').src = saved;
                 document.getElementById('companyLogo').style.display = 'block';
@@ -913,7 +915,7 @@
        function renderCustomers(customers) {
     const tbody = document.getElementById('customersTable');
     if (!customers.length) { 
-        tbody.innerHTML = '=<td colspan="8" style="text-align:center;">暂无客户客户'; 
+        tbody.innerHTML = '=<td colspan="9" style="text-align:center;">暂无客户客户'; 
         return; 
     }
     const levelNames = { vip:'VIP', premium:'高级', medium:'中级', potential:'潜在' };
@@ -943,15 +945,16 @@
         html += '<td style="border:1px solid #ddd; padding:8px;"><span class="' + typeClassVal + '">' + typeText + '</span></td>';
         html += '<td style="border:1px solid #ddd; padding:8px;"><span class="region-badge">' + escapeHtml(regionText) + '</span></td>';
         html += '<td style="border:1px solid #ddd; padding:8px;"><span class="level-' + c.level + '">' + levelNames[c.level] + '</span></td>';
+        html += '<td style="border:1px solid #ddd; padding:8px; max-width:200px; word-wrap:break-word;">' + escapeHtml(c.notes || '—') + '</td>';
         html += '<td style="border:1px solid #ddd; padding:8px;">' + escapeHtml(creatorName) + '</td>';
-       html += '<td style="border:1px solid #ddd; padding:8px;">';
+        html += '<td style="border:1px solid #ddd; padding:8px;">';
         if (isAdmin()) {
-    html += '<button onclick="editCustomer(' + c.id + ')">✏</button>';
-} else {
-    html += '—';
-}
+            html += '<button onclick="editCustomer(' + c.id + ')">✏️</button>';
+        } else {
+            html += '—';
+        }
         if (canDelete(c.user_id)) {
-            html += '<button onclick="deleteCustomer(' + c.id + ')">🗑</button>';
+            html += '<button onclick="deleteCustomer(' + c.id + ')">🗑️</button>';
         } else {
             html += '—';
         }
@@ -974,6 +977,7 @@
         type: document.getElementById('custType').value,
         region_type: regionType,
         level: document.getElementById('custLevel').value,
+        notes: document.getElementById('custNotes') ? document.getElementById('custNotes').value : '',  // ← 正确写法      
         user_id: currentUser.id
     };
     
@@ -1051,6 +1055,7 @@ async function editCustomer(id) {
     document.getElementById('custType').value = customer.type || 'wholesale';
     document.getElementById('regionType').value = customer.region_type || 'domestic';
     document.getElementById('custLevel').value = customer.level || 'medium';
+    document.getElementById('custNotes').value = customer.notes || '';
     
     if (customer.region_type === 'domestic') {
         document.getElementById('province').value = customer.province || '北京市';
@@ -1088,7 +1093,8 @@ async function updateCustomer(id) {
         phone: document.getElementById('custPhone').value,
         type: document.getElementById('custType').value,
         region_type: regionType,
-        level: document.getElementById('custLevel').value
+        level: document.getElementById('custLevel').value,
+        notes: document.getElementById('custNotes').value  // 添加备注
     };
     
     if (regionType === 'domestic') {
@@ -1415,6 +1421,7 @@ function cancelOrderEdit() {
                     '客户性质': typeNameMap[c.type] || '—',
                     '区域': regionText,
                     '客户等级': levelNameMap[c.level] || '—',
+                    '备注': c.notes || '—',           // 添加备注
                     '创建日期': c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'
                 };
             });
@@ -1623,7 +1630,7 @@ function cancelOrderEdit() {
     }
     
     const customer = order.customers;
-const logoUrl = localStorage.getItem('invoice_logo') || '';
+const logoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/invoicelogo.png';
 const logoHtml = logoUrl ? `<img src="${logoUrl}" style="position:absolute; left:0; top:0; max-width:150px; max-height:100px; object-fit:contain;">` : '<div style="width:150px;height:100px;"></div>';
 const today = new Date().toLocaleDateString('zh-CN');
 
@@ -2124,7 +2131,7 @@ function updatePriceHeader() {
     document.getElementById('domesticPriceDate').innerText = today;
     document.getElementById('importPriceDate').innerText = today;
     
-    // const logoUrl = localStorage.getItem('invoice_logo') || '';
+    // const logoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/invoicelogo.png';
      // const logoHtml = logoUrl ? `<img src="${logoUrl}" style="max-width:150px; max-height:100px; object-fit:contain;">` : '';
     // document.getElementById('domesticPriceLogo').innerHTML = logoHtml;
     // document.getElementById('importPriceLogo').innerHTML = logoHtml;
