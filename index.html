@@ -1630,7 +1630,7 @@ function cancelOrderEdit() {
     }
     
     const customer = order.customers;
-const logoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/invoicelogo.png';
+const logoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
 const logoHtml = logoUrl ? `<img src="${logoUrl}" style="position:absolute; left:0; top:0; max-width:150px; max-height:100px; object-fit:contain;">` : '<div style="width:150px;height:100px;"></div>';
 const today = new Date().toLocaleDateString('zh-CN');
 
@@ -1989,7 +1989,7 @@ function loadInvoiceLogoPreview() {
         document.getElementById('clearInvoiceLogoBtn').style.display = 'inline-block';
     } else {
         // 没有上传则使用 GitHub 固定链接
-        const fixedLogoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/logo.png';
+        const fixedLogoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
         document.getElementById('invoiceLogoPreview').src = fixedLogoUrl;
         document.getElementById('invoiceLogoPreview').style.display = 'block';
         document.getElementById('clearInvoiceLogoBtn').style.display = 'none';
@@ -2137,7 +2137,7 @@ function updatePriceHeader() {
     document.getElementById('domesticPriceDate').innerText = today;
     document.getElementById('importPriceDate').innerText = today;
     
-    // const logoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/invoicelogo.png';
+    // const logoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
      // const logoHtml = logoUrl ? `<img src="${logoUrl}" style="max-width:150px; max-height:100px; object-fit:contain;">` : '';
     // document.getElementById('domesticPriceLogo').innerHTML = logoHtml;
     // document.getElementById('importPriceLogo').innerHTML = logoHtml;
