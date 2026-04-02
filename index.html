@@ -779,7 +779,7 @@
         }
         
         function loadSavedLogo() {
-            const saved = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/crmlogo.png';
+            const saved = 'https://s3.bmp.ovh/2026/04/02/90dmO3E4.png';
             if (saved) {
                 document.getElementById('companyLogo').src = saved;
                 document.getElementById('companyLogo').style.display = 'block';
@@ -1630,12 +1630,12 @@ function cancelOrderEdit() {
     }
     
     const customer = order.customers;
-const logoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
+const logoUrl = 'https://s3.bmp.ovh/2026/04/02/8S7kiyXA.png';
 const logoHtml = logoUrl ? `<img src="${logoUrl}" style="position:absolute; left:0; top:0; max-width:150px; max-height:100px; object-fit:contain;">` : '<div style="width:150px;height:100px;"></div>';
 const today = new Date().toLocaleDateString('zh-CN');
 
 // 印章（浮在合计金额上方）
-const stampUrl = localStorage.getItem('company_stamp') || '';
+const stampUrl = 'https://s3.bmp.ovh/2026/04/02/x3ktm9iy.png';
 const stampHtml = stampUrl ? `<div style="position: absolute; right: 120px; top: 190px; z-index: 10;"><img src="${stampUrl}" style="width: 4cm; height: 4cm; object-fit: contain;"></div>` : '';const html = `
     <div style="position:relative; font-family: Arial, '微软雅黑', sans-serif; font-size:12px; max-width:800px; margin:0 auto;">
         <div style="position:absolute; top:50%; left:45%; transform:translate(-50%,-50%) rotate(-30deg); opacity:0.1; font-size:40px; white-space:nowrap; pointer-events:none; z-index:0;">RAFFINATO</div>
@@ -1982,18 +1982,10 @@ function clearInvoiceLogo() {
 
 // 加载销售单Logo预览
 function loadInvoiceLogoPreview() {
-    const savedLogo = localStorage.getItem('invoice_logo');
-    if (savedLogo) {
-        document.getElementById('invoiceLogoPreview').src = savedLogo;
-        document.getElementById('invoiceLogoPreview').style.display = 'block';
-        document.getElementById('clearInvoiceLogoBtn').style.display = 'inline-block';
-    } else {
-        // 没有上传则使用 GitHub 固定链接
-        const fixedLogoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
-        document.getElementById('invoiceLogoPreview').src = fixedLogoUrl;
-        document.getElementById('invoiceLogoPreview').style.display = 'block';
-        document.getElementById('clearInvoiceLogoBtn').style.display = 'none';
-    }
+    const fixedLogoUrl = 'https://s3.bmp.ovh/2026/04/02/8S7kiyXA.png';
+    document.getElementById('invoiceLogoPreview').src = fixedLogoUrl;
+    document.getElementById('invoiceLogoPreview').style.display = 'block';
+    document.getElementById('clearInvoiceLogoBtn').style.display = 'none';
 }
 // ========== 客户搜索下拉框 ==========
 
@@ -2137,7 +2129,7 @@ function updatePriceHeader() {
     document.getElementById('domesticPriceDate').innerText = today;
     document.getElementById('importPriceDate').innerText = today;
     
-    // const logoUrl = 'https://github.com/raffinatofabrics/crm-system/blob/main/invoicelogo.png';
+    // const logoUrl = 'https://s3.bmp.ovh/2026/04/02/8S7kiyXA.png';
      // const logoHtml = logoUrl ? `<img src="${logoUrl}" style="max-width:150px; max-height:100px; object-fit:contain;">` : '';
     // document.getElementById('domesticPriceLogo').innerHTML = logoHtml;
     // document.getElementById('importPriceLogo').innerHTML = logoHtml;
