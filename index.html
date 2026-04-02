@@ -655,7 +655,7 @@
         <div class="price-table-wrapper">
             <table id="importPriceTable">
                 <thead>
-                    <tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>销售价格(元/米)</th><th>经销商价格(元/米)</th><th>渠道价格(元/米)</th><th>样卡价格(元/个)</th></tr>
+                    <tr><th style="width:60px;">序号</th><th>型号</th><th>幅宽</th><th>销售价格(元/米)</th><th>渠道价格(元/米)</th><th>经销商价格(元/米)</th><th>样卡价格(元/个)</th></tr>
                 </thead>
                 <tbody id="importPriceBody"></tbody>
             </table>
@@ -1987,6 +1987,12 @@ function loadInvoiceLogoPreview() {
         document.getElementById('invoiceLogoPreview').src = savedLogo;
         document.getElementById('invoiceLogoPreview').style.display = 'block';
         document.getElementById('clearInvoiceLogoBtn').style.display = 'inline-block';
+    } else {
+        // 没有上传则使用 GitHub 固定链接
+        const fixedLogoUrl = 'https://raw.githubusercontent.com/raffinatofabrics/crm-system/main/logo.png';
+        document.getElementById('invoiceLogoPreview').src = fixedLogoUrl;
+        document.getElementById('invoiceLogoPreview').style.display = 'block';
+        document.getElementById('clearInvoiceLogoBtn').style.display = 'none';
     }
 }
 // ========== 客户搜索下拉框 ==========
