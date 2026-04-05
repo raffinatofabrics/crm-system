@@ -2047,7 +2047,9 @@ if (savedUser) {
             // 切换显示
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
-            switchTab('orders');  // 添加这一行，默认显示订单管理
+            setTimeout(() => {
+    switchTab('orders');
+}, 100); // 添加这一行，默认显示订单管理
 
             // 重新加载数据
             loadCustomers();
