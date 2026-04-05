@@ -527,13 +527,42 @@
                     <div class="company-name">与您携手 共创辉煌</div>
                 </div>
                 <div class="sidebar-menu">
-                    <div class="sidebar-menu-item active" onclick="switchTab('customers')"><span>👥</span><span>客户管理</span></div>
-<div class="sidebar-menu-item" onclick="switchTab('orders')"><span>📦</span><span>订单管理</span></div>
-<div class="sidebar-menu-item" onclick="switchTab('summary')"><span>📊</span><span>订单汇总</span></div>
-<div class="sidebar-menu-item" onclick="switchTab('domesticPrice')"><span>🏭</span><span>自产面料</span></div>
-<div class="sidebar-menu-item" onclick="switchTab('importPrice')"><span>📦</span><span>进口面料</span></div>
-<div class="sidebar-menu-item" id="userMgmtTab" style="display:none;" onclick="switchTab('users')"><span>👑</span><span>用户管理</span></div>
-                </div>
+    <!-- 订单管理（第一个，激活状态） -->
+    <div class="sidebar-menu-item active" onclick="switchTab('orders')">
+        <span>📦</span>
+        <span>订单管理</span>
+    </div>
+    
+    <!-- 客户管理（第二个） -->
+    <div class="sidebar-menu-item" onclick="switchTab('customers')">
+        <span>👥</span>
+        <span>客户管理</span>
+    </div>
+    
+    <!-- 订单汇总 -->
+    <div class="sidebar-menu-item" onclick="switchTab('summary')">
+        <span>📊</span>
+        <span>订单汇总</span>
+    </div>
+    
+    <!-- 自产面料 -->
+    <div class="sidebar-menu-item" onclick="switchTab('domesticPrice')">
+        <span>🏭</span>
+        <span>自产面料</span>
+    </div>
+    
+    <!-- 进口面料 -->
+    <div class="sidebar-menu-item" onclick="switchTab('importPrice')">
+        <span>📦</span>
+        <span>进口面料</span>
+    </div>
+    
+    <!-- 用户管理 -->
+    <div class="sidebar-menu-item" id="userMgmtTab" style="display:none;" onclick="switchTab('users')">
+        <span>👑</span>
+        <span>用户管理</span>
+    </div>
+</div>
                 <div class="user-info-sidebar">
                     <div class="user-name" id="sidebarUserName"></div>
                     <span class="role-badge" id="sidebarRoleBadge"></span>
@@ -1950,8 +1979,8 @@ async function loadDomesticPrices() {
     // 更新菜单高亮
     const menuItems = document.querySelectorAll('.sidebar-menu-item');
     const menuIndex = {
-        'customers': 0,
-        'orders': 1,
+        'orders': 0,
+        'customers': 1,
         'summary': 2,
         'domesticPrice': 3,
         'importPrice': 4,
@@ -2018,7 +2047,8 @@ if (savedUser) {
             // 切换显示
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
-            
+            switchTab('orders');  // 添加这一行，默认显示订单管理
+
             // 重新加载数据
             loadCustomers();
             loadOrders();
