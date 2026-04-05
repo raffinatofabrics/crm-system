@@ -2051,6 +2051,10 @@ if (savedUser) {
     switchTab('orders');
 }, 100); // 添加这一行，默认显示订单管理
 
+// 强制设置标签页显示
+document.getElementById('customersTab').style.display = 'none';
+document.getElementById('ordersTab').style.display = 'block';
+
             // 重新加载数据
             loadCustomers();
             loadOrders();
