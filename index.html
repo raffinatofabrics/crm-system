@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Raffinato商业信息管理系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -271,6 +271,49 @@
         }
 /* 手机端完整适配 */
 @media (max-width: 768px) {
+    /* 价格表标题字体缩小 */
+    #domesticPriceTab .price-title,
+    #importPriceTab .price-title {
+        font-size: 16px;
+    }
+    
+    /* 价格表日期隐藏或缩小 */
+    #domesticPriceTab .price-date,
+    #importPriceTab .price-date {
+        font-size: 10px;
+        width: auto;
+    }
+    
+    /* 价格表按钮换行 */
+    .price-buttons {
+        justify-content: center;
+    }
+    
+    .price-buttons .btn {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    /* 弹窗适配 */
+    .sales-order-content {
+        width: 95%;
+        padding: 12px;
+    }
+    
+    .sales-order .info-row {
+        flex-wrap: wrap;
+    }
+    
+    .sales-order .info-item {
+        flex: 0 0 48%;
+        margin-bottom: 5px;
+    }
+    
+    /* 销售单标题缩小 */
+    .sales-order .title {
+        font-size: 16px;
+    }
+
     /* 侧边栏固定宽度改为全宽 */
     .sidebar {
         width: 100%;
@@ -281,11 +324,13 @@
         justify-content: space-between;
         padding: 0.5rem;
     }
+    
     /* 主内容区取消左边距 */
     .main-content {
         margin-left: 0;
         padding: 0.8rem;
     }
+    
     /* 菜单横向滚动 */
     .sidebar-menu {
         display: flex;
@@ -294,12 +339,14 @@
         padding: 0.5rem;
         width: 100%;
     }
+    
     .sidebar-menu-item {
         flex: 1;
         text-align: center;
         padding: 0.5rem;
         font-size: 0.8rem;
     }
+    
     /* Logo区域水平排列 */
     .logo-area {
         display: flex;
@@ -309,14 +356,17 @@
         width: 100%;
         padding: 0.5rem;
     }
+    
     .company-logo, .logo-placeholder {
         max-width: 80px;
         max-height: 40px;
     }
+    
     .company-name {
         font-size: 0.8rem;
         margin: 0;
     }
+    
     /* 用户信息水平排列 */
     .user-info-sidebar {
         display: flex;
@@ -326,40 +376,49 @@
         width: 100%;
         padding: 0.5rem;
     }
+    
     .logout-btn-sidebar {
         width: auto;
         margin: 0;
     }
+    
     /* 统计卡片2列 */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    
     /* 表单垂直排列 */
     .form-grid {
         flex-direction: column;
     }
+    
     .input-group {
         width: 100%;
     }
+    
     /* 筛选栏垂直排列 */
     .filter-bar {
         flex-direction: column;
     }
+    
     .filter-bar input,
     .filter-bar select,
     .filter-bar button {
         width: 100%;
         margin-bottom: 0.5rem;
     }
+    
     /* 表格横向滚动 */
     .table-wrapper {
         overflow-x: auto;
     }
+    
     table {
         min-width: 600px;
     }
 }
-/* 价格表样式 */
+
+/* 价格表样式（不在手机端适配内） */
 #domesticPriceTab .price-header,
 #importPriceTab .price-header {
     display: flex;
@@ -368,6 +427,7 @@
     margin-bottom: 20px;
     position: relative;
 }
+/* ... 其余价格表样式保持不变 ... */
 #domesticPriceTab .price-logo,
 #importPriceTab .price-logo {
     width: 100px;
