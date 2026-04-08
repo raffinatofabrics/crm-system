@@ -12,42 +12,61 @@
             min-height: 100vh;
         }
         .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .auth-card {
-            background: white;
-            border-radius: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* 使用您提供的图片链接作为背景 */
+    background-image: url('https://s3.bmp.ovh/2026/04/08/gkEglNyV.jpg');
+    background-size: cover;      /* 背景图片覆盖整个容器 */
+    background-position: center; /* 图片居中显示 */
+    background-repeat: no-repeat;/* 禁止图片重复 */
+}
+.auth-card {
+            background: rgba(255, 255, 255, 0.8); /* 白色半透明背景 */          
+border-radius: 2rem;
             padding: 2.5rem;
             width: 100%;
             max-width: 420px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-        .auth-card h2 { font-size: 1.8rem; color: #1e293b; margin-bottom: 0.5rem; }
-        .input-field { margin-bottom: 1.2rem; }
-        .input-field label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.4rem; }
-        .input-field input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 1rem;
-            font-size: 0.95rem;
-            outline: none;
-        }
-        .auth-btn {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
+
+      @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;500;600;700&display=swap');
+
+.auth-card h2 {
+    font-size: 1.8rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-family: 'Josefin Sans', '微软雅黑', 'Microsoft YaHei', sans-serif;
+    font-weight: 600;
+}
+
+.auth-card p {
+    text-align: center;  /* 副标题居中（如果有） */
+}
+
+.input-field { margin-bottom: 1.2rem; }
+.input-field label { display: block; font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.4rem; }
+.input-field input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
+    font-size: 0.95rem;
+    outline: none;
+}
+.auth-btn {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
         .app-container { display: none; min-height: 100vh; background: #f1f5f9; }
         .app-layout { display: flex; min-height: 100vh; }
         .sidebar {
@@ -507,7 +526,7 @@
     <div id="authContainer" class="auth-container">
         <div class="auth-card">
             <h2>Raffinato Fabrics</h2>
-            <p style="color:#64748b; margin-bottom:1.5rem;">Raffinato 商业信息管理系统</p>
+            <p style="color:#64748b; margin-bottom:1.5rem;">瑞菲纳朵商业信息管理系统</p>
             <div id="loginForm">
                 <div class="input-field"><label>用户名</label><input type="text" id="loginUsername" placeholder="请输入用户名"></div>
                 <div class="input-field"><label>密码</label><input type="password" id="loginPassword" placeholder="请输入密码"></div>
@@ -2493,6 +2512,56 @@ async function downloadPriceFile(type, currency) {
     XLSX.writeFile(wb, fileName);
     showToast('下载成功');
 }
+
+
+// ========== 防止查看源代码（基础防护）==========
+// 禁止右键菜单
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// 禁止开发者工具快捷键
+document.addEventListener('keydown', function(e) {
+    // 禁止 F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁止 Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁止 Ctrl+U（查看源代码）
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁止 Ctrl+S（保存页面）
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁止 Ctrl+Shift+J
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// 检测开发者工具是否打开（可选）
+setInterval(function() {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+        // 开发者工具已打开，可以执行操作
+        console.log('开发者工具已打开');
+        // 可选：清空页面或显示警告
+        // document.body.innerHTML = '<h1>开发者工具已禁用</h1>';
+    }
+}, 5000);
 </script>
 </body>
 </html>
